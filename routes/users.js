@@ -277,7 +277,7 @@ app.post("/resetpass", async (req, res) => {
     if (user.length === 0) {
       return res.status(400).json({ error: true, msg: "El usuario no existe" });
     }
-   
+
     let newpass = Math.random().toString(36).substring(0, 10);
 
     let message = {
@@ -545,7 +545,7 @@ app.post("/registrarTicket", async (req, res) => {
       fechaCompra,
       idCliente,
       fotoTicket,
-      idVendedor
+      idVendedor,
     } = req.body;
 
     // Validaciones básicas
@@ -562,14 +562,12 @@ app.post("/registrarTicket", async (req, res) => {
         .json({ error: true, msg: "Faltan datos requeridos" });
     }
 
-
     // Subir imagen a Cloudinary
     const uploadResponse = await cloudinary.uploader.upload(fotoTicket, {
       folder: "imagenes", // Carpeta donde se guardará en Cloudinary
       resource_type: "image",
     });
     const imageUrl = uploadResponse.secure_url;
-
 
     let trivia = 0;
     let puntos = 0;
@@ -620,45 +618,46 @@ app.post("/registrarTicket", async (req, res) => {
       imageUrl,
       fecha,
       trivia,
-      idVendedor
+      idVendedor,
     ];
 
     let result = await db.pool.query(query, values);
     result = result[0];
 
-    //buscamos la ultima trivia del usuario
-    const [rows] = await db.pool.query(
-      `SELECT num_trivia FROM conjunto_triv WHERE id_user_conj = ? ORDER BY num_trivia DESC LIMIT 1`,
-      [idCliente]
-    );
+    //solo agrega trivia si puntos > 0
+    if (puntos > 0) {
+      //buscamos la ultima trivia del usuario
+      const [rows] = await db.pool.query(
+        `SELECT num_trivia FROM conjunto_triv WHERE id_user_conj = ? ORDER BY num_trivia DESC LIMIT 1`,
+        [idCliente]
+      );
 
-    let ultima_trivia = 0;
-    if (rows.length > 0) {
-      ultima_trivia = rows[0].num_trivia;
-    }
+      let ultima_trivia = 0;
+      if (rows.length > 0) {
+        ultima_trivia = rows[0].num_trivia;
+      }
 
-    
-    //INSERT EN conjunto_triv
-    const query2 = `INSERT INTO conjunto_triv (
-      id_user_conj,
-      id_comp_conj,
-      id_unid_conj,
-      num_trivia,
-      cat_conj,
-      estatus_conj
-      ) 
-      VALUES (?, ?, ?, ?, ?, ?)`;
+      //INSERT EN conjunto_triv
+      const query2 = `INSERT INTO conjunto_triv (
+        id_user_conj,
+        id_comp_conj,
+        id_unid_conj,
+        num_trivia,
+        cat_conj,
+        estatus_conj
+        ) 
+        VALUES (?, ?, ?, ?, ?, ?)`;
       const values2 = [
         idCliente,
         result.insertId,
         idUnidad,
         ultima_trivia + 1,
         puntos,
-        "asignada"
+        "asignada",
       ];
 
       let result2 = await db.pool.query(query2, values2);
-
+    }
 
     res.status(201).json({
       error: false,
