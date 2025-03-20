@@ -572,13 +572,17 @@ app.post("/registrarTicket", async (req, res) => {
 
 
     let trivia = 0;
+    let puntos = 0;
 
     if (total >= 80 && total <= 239) {
       trivia = 1;
+      puntos = 1;
     } else if (total >= 240 && total <= 399) {
       trivia = 2;
+      puntos = 3;
     } else if (total >= 400) {
       trivia = 3;
+      puntos = 5;
     }
 
     let today = new Date();
@@ -621,6 +625,40 @@ app.post("/registrarTicket", async (req, res) => {
 
     let result = await db.pool.query(query, values);
     result = result[0];
+
+    //buscamos la ultima trivia del usuario
+    const [rows] = await db.pool.query(
+      `SELECT num_trivia FROM conjunto_triv WHERE id_user_conj = ? ORDER BY num_trivia DESC LIMIT 1`,
+      [idCliente]
+    );
+
+    let ultima_trivia = 0;
+    if (rows.length > 0) {
+      ultima_trivia = rows[0].num_trivia;
+    }
+
+    
+    //INSERT EN conjunto_triv
+    const query2 = `INSERT INTO conjunto_triv (
+      id_user_conj,
+      id_comp_conj,
+      id_unid_conj,
+      num_trivia,
+      cat_conj,
+      estatus_conj
+      ) 
+      VALUES (?, ?, ?, ?, ?, ?)`;
+      const values2 = [
+        idCliente,
+        result.insertId,
+        idUnidad,
+        ultima_trivia + 1,
+        puntos,
+        "asignada"
+      ];
+
+      let result2 = await db.pool.query(query2, values2);
+
 
     res.status(201).json({
       error: false,
