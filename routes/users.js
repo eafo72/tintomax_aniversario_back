@@ -545,6 +545,7 @@ app.post("/registrarTicket", async (req, res) => {
       fechaCompra,
       idCliente,
       fotoTicket,
+      idVendedor
     } = req.body;
 
     // Validaciones básicas
@@ -601,9 +602,10 @@ app.post("/registrarTicket", async (req, res) => {
       id_usuario_comp,
       foto_comp,
       fecha_reg_comp,
-      cat_trivia_comp
+      cat_trivia_comp,
+      id_usuario_vend_comp
       ) 
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`;
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
     const values = [
       numeroNota,
       idUnidad,
@@ -614,6 +616,7 @@ app.post("/registrarTicket", async (req, res) => {
       imageUrl,
       fecha,
       trivia,
+      idVendedor
     ];
 
     let result = await db.pool.query(query, values);
