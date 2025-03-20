@@ -6,6 +6,10 @@ const jwt = require("jsonwebtoken");
 const auth = require("../middlewares/authorization");
 const db = require("../config/db");
 const mailer = require("../controller/mailController");
+const cloudinary = require("../config/cloudinaryConfig");
+const bodyParser = require("body-parser");
+
+app.use(bodyParser.json({ limit: "10mb" })); // Permitir imágenes grandes en base64
 
 app.get("/usuarios", async (req, res) => {
   try {
@@ -549,12 +553,22 @@ app.post("/registrarTicket", async (req, res) => {
       !idUnidad ||
       !cantidadPrendas ||
       !total ||
-      !fechaCompra
+      !fechaCompra ||
+      !fotoTicket
     ) {
       return res
         .status(400)
         .json({ error: true, msg: "Faltan datos requeridos" });
     }
+
+
+    // Subir imagen a Cloudinary
+    const uploadResponse = await cloudinary.uploader.upload(fotoTicket, {
+      folder: "imagenes", // Carpeta donde se guardará en Cloudinary
+      resource_type: "image",
+    });
+    const imageUrl = uploadResponse.secure_url;
+
 
     let trivia = 0;
 
@@ -597,7 +611,7 @@ app.post("/registrarTicket", async (req, res) => {
       total,
       fechaCompra,
       idCliente,
-      fotoTicket,
+      imageUrl,
       fecha,
       trivia,
     ];
