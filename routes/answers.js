@@ -48,7 +48,7 @@ app.get("/check/:idTrivia/:idUser/:idQuiz/:idAnswer", async (req, res) => {
 
     query = `INSERT INTO respuestas 
          (id_usuario_resp,
-          id_pregunta_resp,
+          id_preg_resp,
           id_conj_resp,
           id_cat_resp,
           opcion_selec_resp,
