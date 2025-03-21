@@ -22,7 +22,7 @@ app.get("/quiz/:idTrivia/:idUser", async (req, res) => {
   
   try {
     let query = `
-    SELECT * FROM preguntas 
+    SELECT preguntas.id_pregunta, preguntas.opcion_1_preg, preguntas.opcion_2_preg, preguntas.opcion_3_preg, preguntas.pregunta FROM preguntas 
     WHERE id_pregunta >= ? 
     AND id_pregunta <= ? 
     AND id_pregunta NOT IN (
