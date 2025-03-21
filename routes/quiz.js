@@ -21,10 +21,10 @@ app.get("/quiz/:idTrivia", async (req, res) => {
   try {
 
     let query = `SELECT * FROM preguntas WHERE id_pregunta >= ? LIMIT 3`;
-    let trivias = await db.pool.query(query, [questionId]);
-    trivias = trivias[0];
+    let quiz = await db.pool.query(query, [questionId]);
+    quiz = quiz[0];
 
-    res.status(200).json({ error: false, trivias });
+    res.status(200).json({ error: false, quiz });
     
   } catch (error) {
     res.status(500).json({
