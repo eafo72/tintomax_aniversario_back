@@ -672,4 +672,31 @@ app.post("/registrarTicket", async (req, res) => {
   }
 });
 
+app.get("/trivias/:id", async (req, res) => {
+  let userId = req.params.id;
+
+  if (!userId) {
+    return res.status(400).json({
+      msg: "El id debe de tener algun valor",
+      error: true,
+    });
+  }
+
+  try {
+
+    let query = `SELECT * FROM conjunto_triv WHERE id_user_conj = ?`;
+    let trivias = await db.pool.query(query, [userId]);
+    trivias = trivias[0];
+
+    res.status(200).json({ error: false, trivias });
+    
+  } catch (error) {
+    res.status(500).json({
+      msg: "Hubo un error obteniendo los datos",
+      error: true,
+      details: error,
+    });
+  }
+});
+
 module.exports = app;
