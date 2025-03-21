@@ -4,11 +4,12 @@ const app = express.Router();
 const db = require("../config/db");
 
 
-//preguntas por id trivia
-app.get("/quiz/:idTrivia", async (req, res) => {
+//preguntas por id trivia y id_usuario
+app.get("/quiz/:idTrivia/:idUser", async (req, res) => {
   let id_trivia = req.params.idTrivia;
+  let id_usuario = req.params.idUser;
 
-  if (!id_trivia) {
+  if (!id_trivia || !id_usuario) {
     return res.status(400).json({
       msg: "El id_trivia debe de tener algun valor",
       error: true,
@@ -16,12 +17,22 @@ app.get("/quiz/:idTrivia", async (req, res) => {
   }
 
   //calculamos el primer id de pregunta
-  const questionId = (Number(id_trivia) - 1) * 3 + 1;
+  const startQuestionId = (Number(id_trivia) - 1) * 3 + 1;
+  const endQuestionId = startQuestionId + 2;
   
   try {
+    let query = `
+    SELECT * FROM preguntas 
+    WHERE id_pregunta >= ? 
+    AND id_pregunta <= ? 
+    AND id_pregunta NOT IN (
+        SELECT id_preg_resp FROM respuestas WHERE id_usuario_resp = ?
+    ) 
+    ORDER BY id_pregunta ASC 
+    LIMIT 1
+    `;
 
-    let query = `SELECT * FROM preguntas WHERE id_pregunta >= ? LIMIT 3`;
-    let quiz = await db.pool.query(query, [questionId]);
+    let quiz = await db.pool.query(query, [startQuestionId, endQuestionId, id_usuario]);
     quiz = quiz[0];
 
     res.status(200).json({ error: false, quiz });
