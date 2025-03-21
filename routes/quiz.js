@@ -11,7 +11,7 @@ app.get("/quiz/:idTrivia/:idUser", async (req, res) => {
 
   if (!id_trivia || !id_usuario) {
     return res.status(400).json({
-      msg: "El id_trivia debe de tener algun valor",
+      msg: "Faltan valores",
       error: true,
     });
   }

@@ -5,6 +5,7 @@ const cors = require('cors');
 const app = express();
 const userRoutes = require('./routes/users');
 const quizRoutes = require('./routes/quiz');
+const answerRoutes = require('./routes/answers');
 
 require('dotenv').config();
 
@@ -16,6 +17,7 @@ app.use(express.json());
 //rutas
 app.use('/usuario', userRoutes);
 app.use('/preguntas', quizRoutes);
+app.use('/respuestas', answerRoutes);
 
 app.get('/', (req, res) => res.send('TINTOMAX API'));
 
