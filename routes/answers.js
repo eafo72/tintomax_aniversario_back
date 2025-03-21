@@ -22,7 +22,7 @@ app.get("/check/:idTrivia/:idUser/:idQuiz/:idAnswer", async (req, res) => {
     
     let query = `SELECT * FROM preguntas WHERE id_pregunta = ?`;
     let answer = await db.pool.query(query, [id_pregunta]);
-    answer = answer[0];
+    answer = answer[0][0];
 
     let resultado = 'Incorrecto';
     let respuesta_bool = 0 //false
@@ -35,7 +35,7 @@ app.get("/check/:idTrivia/:idUser/:idQuiz/:idAnswer", async (req, res) => {
     //buscamos cuantos puntos vale la respuesta correcta
     query = `SELECT * FROM conjunto_triv WHERE num_trivia = ? AND id_user_conj = ?`;
     answer = await db.pool.query(query, [id_trivia, id_usuario]);
-    answer = answer[0];
+    answer = answer[0][0];
     const puntosporrespuestacorrecta = answer.cat_conj;
 
     let totalPuntos = 0;
