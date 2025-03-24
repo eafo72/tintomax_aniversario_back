@@ -20,9 +20,7 @@ app.get("/quiz/:idTrivia/:idUser", async (req, res) => {
   const startQuestionId = (Number(id_trivia) - 1) * 3 + 1;
   const endQuestionId = startQuestionId + 2;
 
-  console.log("start:"+startQuestionId);
-  console.log("end:"+endQuestionId);
-  
+   
   try {
     let query = `
     SELECT preguntas.id_pregunta, preguntas.opcion_1_preg, preguntas.opcion_2_preg, preguntas.opcion_3_preg, preguntas.pregunta FROM preguntas 
@@ -39,6 +37,8 @@ app.get("/quiz/:idTrivia/:idUser", async (req, res) => {
 
     let quiz = await db.pool.query(query, [startQuestionId, endQuestionId, id_usuario]);
     quiz = quiz[0];
+
+    console.log(quiz);
 
     res.status(200).json({ error: false, quiz });
     
