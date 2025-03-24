@@ -69,8 +69,13 @@ app.get("/check/:idTrivia/:idUser/:idQuiz/:idAnswer", async (req, res) => {
     
         await db.pool.query(query, values);
 
+        //vemos si fue la ultima pregunta
+        if(id_pregunta % 3 === 0){
 
+           const updateQuery = `UPDATE conjunto_triv SET estatus_conj = 'contestada' WHERE id_user_conj = ? AND num_trivia = ?`;
+           await db.pool.query(updateQuery, [id_usuario, id_trivia]);
 
+        }
 
 
     res.status(200).json({ error: false, resultado });
