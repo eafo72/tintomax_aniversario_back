@@ -19,6 +19,9 @@ app.get("/quiz/:idTrivia/:idUser", async (req, res) => {
   //calculamos el primer id de pregunta
   const startQuestionId = (Number(id_trivia) - 1) * 3 + 1;
   const endQuestionId = startQuestionId + 2;
+
+  console.log("start:"+startQuestionId);
+  console.log("end:"+endQuestionId);
   
   try {
     let query = `
@@ -32,7 +35,7 @@ app.get("/quiz/:idTrivia/:idUser", async (req, res) => {
     LIMIT 1
     `;
 
-    console.log(query);
+    
 
     let quiz = await db.pool.query(query, [startQuestionId, endQuestionId, id_usuario]);
     quiz = quiz[0];
