@@ -33,12 +33,8 @@ app.get("/quiz/:idTrivia/:idUser", async (req, res) => {
     LIMIT 1
     `;
 
-    
-
     let quiz = await db.pool.query(query, [startQuestionId, endQuestionId, id_usuario]);
     quiz = quiz[0];
-
-    console.log(quiz);
 
     res.status(200).json({ error: false, quiz });
     
