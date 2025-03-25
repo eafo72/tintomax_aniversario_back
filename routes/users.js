@@ -662,6 +662,7 @@ app.post("/registrarTicket", async (req, res) => {
     res.status(201).json({
       error: false,
       msg: "Ticket registrado exitosamente",
+      nextTrivia: ultima_trivia + 1,
       ticketId: result.insertId,
     });
   } catch (error) {
