@@ -145,6 +145,33 @@ app.post("/crear", async (req, res) => {
     let result = await db.pool.query(query, values);
     result = result[0];
 
+    //CREAR TRIVIAS
+    // Obtener todas las preguntas necesarias antes de insertarlas
+    const [preguntasGenerales] = await connection.query(
+      "SELECT id_pregunta FROM preguntas ORDER BY RAND() LIMIT 100"
+    );
+    const [preguntasMax] = await connection.query(
+      "SELECT id_pregunta_max FROM preguntas_max ORDER BY RAND() LIMIT 50"
+    );
+
+    
+    const query3 = "INSERT INTO conjunto_triv (id_user_conj, id_preg_1_conj, id_preg_2_conj, id_preg_3_conj, num_trivia) VALUES (?, ?, ?, ?, ?)";
+
+    // Insertar 50 trivias asegurando que cada una tiene preguntas únicas
+    for (let i = 0; i < 5; i++) {
+      const pregunta_1 = preguntasGenerales.shift().id;
+      const pregunta_2 = preguntasGenerales.shift().id;
+      const pregunta_3 = preguntasMax.shift().id;
+      await connection.query(query, [
+        result.insertId,
+        pregunta_1,
+        pregunta_2,
+        pregunta_3,
+        i+1
+      ]);
+    }
+
+    //crear token
     const payload = {
       user: {
         id: result.insertId,
@@ -684,13 +711,11 @@ app.get("/trivias/:id", async (req, res) => {
   }
 
   try {
-
     let query = `SELECT * FROM conjunto_triv WHERE id_user_conj = ?`;
     let trivias = await db.pool.query(query, [userId]);
     trivias = trivias[0];
 
     res.status(200).json({ error: false, trivias });
-    
   } catch (error) {
     res.status(500).json({
       msg: "Hubo un error obteniendo los datos",
