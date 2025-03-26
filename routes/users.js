@@ -80,8 +80,7 @@ app.post("/crear", async (req, res) => {
       });
     }
 
-    /*
-
+    
     //Verificamos no exista el correo en la DB
     let query = `SELECT * FROM usuarios WHERE correo_usur = '${correo_usur}'`;
     let existCorreo = await db.pool.query(query);
@@ -147,7 +146,7 @@ app.post("/crear", async (req, res) => {
 
     let result = await db.pool.query(query, values);
     result = result[0];
-*/
+
     //CREAR TRIVIAS
     // Obtener todas las preguntas necesarias antes de insertarlas
     const [preguntasGenerales] = await db.pool.query(
@@ -169,7 +168,7 @@ app.post("/crear", async (req, res) => {
       const pregunta_2 = preguntasGenerales.shift().id_pregunta;
       const pregunta_3 = preguntasMax.shift().id_pregunta_max;
       await db.pool.query(query3, [
-        1,
+        result.insertId,
         pregunta_1,
         pregunta_2,
         pregunta_3,
@@ -177,7 +176,7 @@ app.post("/crear", async (req, res) => {
         'creada'
       ]);
     }
-/*
+
     //crear token
     const payload = {
       user: {
@@ -198,7 +197,7 @@ app.post("/crear", async (req, res) => {
     };
     const info = await mailer.sendMail(message);
     console.log(info);
-*/
+
     res.status(200).json({ error: false, msg: "Usuario creado exitosamente" });
     } catch (error) {
     console.log(error);
