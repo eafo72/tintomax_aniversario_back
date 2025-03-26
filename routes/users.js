@@ -162,7 +162,7 @@ app.post("/crear", async (req, res) => {
       const pregunta_1 = preguntasGenerales.shift().id;
       const pregunta_2 = preguntasGenerales.shift().id;
       const pregunta_3 = preguntasMax.shift().id;
-      await connection.query(query, [
+      await db.pool.query(query, [
         result.insertId,
         pregunta_1,
         pregunta_2,
