@@ -149,12 +149,15 @@ app.post("/crear", async (req, res) => {
     //CREAR TRIVIAS
     // Obtener todas las preguntas necesarias antes de insertarlas
     const [preguntasGenerales] = await db.pool.query(
-      "SELECT id_pregunta FROM preguntas ORDER BY RAND() LIMIT 100"
+      "SELECT id_pregunta FROM preguntas ORDER BY RAND() LIMIT 10"
     );
     const [preguntasMax] = await db.pool.query(
-      "SELECT id_pregunta_max FROM preguntas_max ORDER BY RAND() LIMIT 50"
+      "SELECT id_pregunta_max FROM preguntas_max ORDER BY RAND() LIMIT 5"
     );
 
+    if (preguntasGenerales.length < 10 || preguntasMax.length < 5) {
+      throw new Error("No hay suficientes preguntas en la base de datos.");
+    }
     
     const query3 = "INSERT INTO conjunto_triv (id_user_conj, id_preg_1_conj, id_preg_2_conj, id_preg_3_conj, num_trivia) VALUES (?, ?, ?, ?, ?)";
 
