@@ -666,6 +666,7 @@ app.post("/registrarTicket", async (req, res) => {
       );
 
       let ultima_trivia = 0;
+
       if (rows.length > 0) {
         ultima_trivia = rows[0].num_trivia;
       }
@@ -694,7 +695,7 @@ app.post("/registrarTicket", async (req, res) => {
     res.status(201).json({
       error: false,
       msg: "Ticket registrado exitosamente",
-      nextTrivia: ultima_trivia + 1,
+      nextTrivia: trivia_nueva,
       ticketId: result.insertId,
     });
   } catch (error) {
