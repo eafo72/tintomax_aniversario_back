@@ -147,10 +147,10 @@ app.post("/crear", async (req, res) => {
 
     //CREAR TRIVIAS
     // Obtener todas las preguntas necesarias antes de insertarlas
-    const [preguntasGenerales] = await connection.query(
+    const [preguntasGenerales] = await db.pool.query(
       "SELECT id_pregunta FROM preguntas ORDER BY RAND() LIMIT 100"
     );
-    const [preguntasMax] = await connection.query(
+    const [preguntasMax] = await db.pool.query(
       "SELECT id_pregunta_max FROM preguntas_max ORDER BY RAND() LIMIT 50"
     );
 
