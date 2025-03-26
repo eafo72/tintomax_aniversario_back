@@ -161,7 +161,7 @@ app.post("/crear", async (req, res) => {
       throw new Error("No hay suficientes preguntas en la base de datos.");
     }
     
-    const query3 = "INSERT INTO conjunto_triv (id_user_conj, id_preg_1_conj, id_preg_2_conj, id_preg_3_conj, num_trivia) VALUES (?, ?, ?, ?, ?)";
+    const query3 = "INSERT INTO conjunto_triv (id_user_conj, id_preg1_conj, id_preg2_conj, id_preg3_conj, num_trivia) VALUES (?, ?, ?, ?, ?)";
 
     // Insertar 50 trivias asegurando que cada una tiene preguntas únicas
     for (let i = 0; i < 5; i++) {
