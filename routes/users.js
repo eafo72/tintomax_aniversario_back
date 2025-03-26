@@ -128,7 +128,7 @@ app.post("/crear", async (req, res) => {
 	    created_at,
 	    updated_at) 
 	    VALUES 
-	    (?, ?, ?, ?, ?, ?, ?, 'registrado', ?, ?)`;
+	    (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
 
     const values = [
       nombre_usur,
@@ -137,7 +137,8 @@ app.post("/crear", async (req, res) => {
       ciudad_usur,
       forma_usur,
       hashedPassword,
-      tipo_usur,
+      'cliente',
+      'registrado',
       fecha,
       fecha,
     ];
