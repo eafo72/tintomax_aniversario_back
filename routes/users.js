@@ -165,9 +165,9 @@ app.post("/crear", async (req, res) => {
 
     // Insertar 50 trivias asegurando que cada una tiene preguntas únicas
     for (let i = 0; i < 5; i++) {
-      const pregunta_1 = preguntasGenerales.shift().id;
-      const pregunta_2 = preguntasGenerales.shift().id;
-      const pregunta_3 = preguntasMax.shift().id;
+      const pregunta_1 = preguntasGenerales.shift().id_pregunta;
+      const pregunta_2 = preguntasGenerales.shift().id_pregunta;
+      const pregunta_3 = preguntasMax.shift().id_pregunta_max;
       await db.pool.query(query3, [
         1,
         pregunta_1,
