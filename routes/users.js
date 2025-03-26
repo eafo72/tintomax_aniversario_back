@@ -137,7 +137,7 @@ app.post("/crear", async (req, res) => {
       ciudad_usur,
       forma_usur,
       hashedPassword,
-      'cliente',
+      tipo_usur,
       'registrado',
       fecha,
       fecha,
