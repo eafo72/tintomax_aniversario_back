@@ -80,7 +80,6 @@ app.post("/crear", async (req, res) => {
       });
     }
 
-    
     //Verificamos no exista el correo en la DB
     let query = `SELECT * FROM usuarios WHERE correo_usur = '${correo_usur}'`;
     let existCorreo = await db.pool.query(query);
@@ -139,7 +138,7 @@ app.post("/crear", async (req, res) => {
       forma_usur,
       hashedPassword,
       tipo_usur,
-      'registrado',
+      "registrado",
       fecha,
       fecha,
     ];
@@ -159,8 +158,9 @@ app.post("/crear", async (req, res) => {
     if (preguntasGenerales.length < 100 || preguntasMax.length < 50) {
       throw new Error("No hay suficientes preguntas en la base de datos.");
     }
-    
-    const query3 = "INSERT INTO conjunto_triv (id_user_conj, id_preg1_conj, id_preg2_conj, id_preg3_conj, num_trivia, estatus_conj) VALUES (?, ?, ?, ?, ?, ?)";
+
+    const query3 =
+      "INSERT INTO conjunto_triv (id_user_conj, id_preg1_conj, id_preg2_conj, id_preg3_conj, num_trivia, estatus_conj) VALUES (?, ?, ?, ?, ?, ?)";
 
     // Insertar 50 trivias asegurando que cada una tiene preguntas únicas
     for (let i = 0; i < 50; i++) {
@@ -172,8 +172,8 @@ app.post("/crear", async (req, res) => {
         pregunta_1,
         pregunta_2,
         pregunta_3,
-        i+1,
-        'creada'
+        i + 1,
+        "creada",
       ]);
     }
 
@@ -199,7 +199,7 @@ app.post("/crear", async (req, res) => {
     console.log(info);
 
     res.status(200).json({ error: false, msg: "Usuario creado exitosamente" });
-    } catch (error) {
+  } catch (error) {
     console.log(error);
     return res.status(400).json({
       error: true,
@@ -661,7 +661,7 @@ app.post("/registrarTicket", async (req, res) => {
     if (puntos > 0) {
       //buscamos la ultima trivia del usuario
       const [rows] = await db.pool.query(
-        `SELECT num_trivia FROM conjunto_triv WHERE id_user_conj = ? ORDER BY num_trivia DESC LIMIT 1`,
+        `SELECT num_trivia FROM conjunto_triv WHERE id_user_conj = ? AND estatus_conj = 'asignada' ORDER BY num_trivia DESC LIMIT 1`,
         [idCliente]
       );
 
@@ -670,23 +670,22 @@ app.post("/registrarTicket", async (req, res) => {
         ultima_trivia = rows[0].num_trivia;
       }
 
-      //INSERT EN conjunto_triv
-      const query2 = `INSERT INTO conjunto_triv (
-        id_user_conj,
-        id_comp_conj,
-        id_unid_conj,
-        num_trivia,
-        cat_conj,
-        estatus_conj
-        ) 
-        VALUES (?, ?, ?, ?, ?, ?)`;
+      const trivia_nueva = Number(ultima_trivia) + 1;
+
+      //UPDATE
+      const query2 = `UPDATE conjunto_triv SET 
+                    id_comp_conj = ?, 
+                    id_unid_conj = ?, 
+                    cat_conj = ?, 
+                    estatus_conj = ?
+                WHERE num_trivia = ?`;
+
       const values2 = [
-        idCliente,
         result.insertId,
         idUnidad,
-        ultima_trivia + 1,
         puntos,
         "asignada",
+        trivia_nueva,
       ];
 
       let result2 = await db.pool.query(query2, values2);
@@ -717,7 +716,7 @@ app.get("/trivias/:id", async (req, res) => {
   }
 
   try {
-    let query = `SELECT * FROM conjunto_triv WHERE id_user_conj = ?`;
+    let query = `SELECT * FROM conjunto_triv WHERE id_user_conj = ? AND estatus_conj = 'asignada'`;
     let trivias = await db.pool.query(query, [userId]);
     trivias = trivias[0];
 
