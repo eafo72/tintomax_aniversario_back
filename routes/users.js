@@ -658,6 +658,7 @@ app.post("/registrarTicket", async (req, res) => {
     result = result[0];
 
     let ultima_trivia = 0;
+    let trivia_nueva = 0;
 
     //solo agrega trivia si puntos > 0
     if (puntos > 0) {
@@ -671,7 +672,7 @@ app.post("/registrarTicket", async (req, res) => {
         ultima_trivia = rows[0].num_trivia;
       }
 
-      const trivia_nueva = Number(ultima_trivia) + 1;
+      trivia_nueva = Number(ultima_trivia) + 1;
 
       //UPDATE
       const query2 = `UPDATE conjunto_triv SET 
@@ -698,6 +699,7 @@ app.post("/registrarTicket", async (req, res) => {
       nextTrivia: trivia_nueva,
       ticketId: result.insertId,
     });
+
   } catch (error) {
     console.error("Error inesperado:", error);
     res
