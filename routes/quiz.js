@@ -19,6 +19,10 @@ app.get("/quiz/:idTrivia/:idUser", async (req, res) => {
     let query = `SELECT * FROM conjunto_triv WHERE id_user_conj = ? AND num_trivia = ? AND estatus_conj = 'asignada'`;
     let quiz = await db.pool.query(query, [id_usuario, id_trivia]);
     quiz = quiz[0];
+    
+    const id_pregunta1 = quiz[0].id_preg1_conj;
+    const id_pregunta2 = quiz[0].id_preg2_conj;
+    const id_pregunta3 = quiz[0].id_preg3_conj;
 
     //pregunta 1
     query = `SELECT preguntas.id_pregunta, preguntas.opcion_1_preg, preguntas.opcion_2_preg, preguntas.opcion_3_preg, preguntas.pregunta FROM preguntas 
@@ -28,7 +32,7 @@ app.get("/quiz/:idTrivia/:idUser", async (req, res) => {
     ) 
     LIMIT 1
     `;
-    quiz = await db.pool.query(query, [quiz[0].id_preg1_conj, id_usuario]);
+    quiz = await db.pool.query(query, [id_pregunta1, id_usuario]);
     quiz = quiz[0];
 
     if (quiz.length == 0) {
@@ -40,7 +44,7 @@ app.get("/quiz/:idTrivia/:idUser", async (req, res) => {
       ) 
       LIMIT 1
       `;
-      quiz = await db.pool.query(query, [quiz[0].id_preg2_conj, id_usuario]);
+      quiz = await db.pool.query(query, [id_pregunta2, id_usuario]);
       quiz = quiz[0];
 
       if (quiz.length == 0) {
@@ -52,13 +56,13 @@ app.get("/quiz/:idTrivia/:idUser", async (req, res) => {
         ) 
         LIMIT 1
         `;
-        quiz = await db.pool.query(query, [quiz[0].id_preg3_conj, id_usuario]);
+        quiz = await db.pool.query(query, [id_pregunta3, id_usuario]);
         quiz = quiz[0];
       }
     }
 
     res.status(200).json({ error: false, quiz });
-    
+
   } catch (error) {
     res.status(500).json({
       msg: "Hubo un error obteniendo los datos",
