@@ -25,18 +25,33 @@ app.get("/check/:idTrivia/:idUser/:idQuiz/:idAnswer/:numQuestion", async (req, r
       tipo_pregunta = 'max';
     }
 
-    let query = `SELECT * FROM preguntas WHERE id_pregunta = ?`;
-    let answer = await db.pool.query(query, [id_pregunta]);
-    answer = answer[0][0];
-
+    let query = '';  
+    let answer = '';
     let resultado = 'Incorrecto';
     let respuesta_bool = 0 //false
 
-    if(Number(answer.resp_preg) == Number(id_respuesta)){
-      resultado = 'Correcto';
-      respuesta_bool = 1 //true
-    }
+    if(num_pregunta == 3){
+      query = `SELECT * FROM preguntas_max WHERE id_pregunta_max = ?`;
+      answer = await db.pool.query(query, [id_pregunta]);
+      answer = answer[0][0];
 
+      if(Number(answer.resp_preg_max) == Number(id_respuesta)){
+        resultado = 'Correcto';
+        respuesta_bool = 1 //true
+      }
+
+    }else{
+      query = `SELECT * FROM preguntas WHERE id_pregunta = ?`;
+      answer = await db.pool.query(query, [id_pregunta]);
+      answer = answer[0][0];
+
+      if(Number(answer.resp_preg) == Number(id_respuesta)){
+        resultado = 'Correcto';
+        respuesta_bool = 1 //true
+      }
+
+    }
+    
     //buscamos cuantos puntos vale la respuesta correcta
     query = `SELECT * FROM conjunto_triv WHERE num_trivia = ? AND id_user_conj = ?`;
     answer = await db.pool.query(query, [id_trivia, id_usuario]);
