@@ -66,7 +66,7 @@ app.get("/quiz/:idTrivia/:idUser", async (req, res) => {
       }
     }
 
-    quiz.numeroPregunta = numeroPregunta;
+    quiz[0].numeroPregunta = numeroPregunta;
     res.status(200).json({ error: false, quiz });
 
   } catch (error) {
