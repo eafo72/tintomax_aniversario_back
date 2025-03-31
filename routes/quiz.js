@@ -34,8 +34,8 @@ app.get("/quiz/:idTrivia/:idUser", async (req, res) => {
     ) 
     LIMIT 1
     `;
-    console.log(query);
     quiz = await db.pool.query(query, [id_pregunta1, id_usuario]);
+    console.log(quiz);
     quiz = quiz[0];
     numeroPregunta = 1;
 
@@ -48,8 +48,8 @@ app.get("/quiz/:idTrivia/:idUser", async (req, res) => {
       ) 
       LIMIT 1
       `;
-      console.log(query);
       quiz = await db.pool.query(query, [id_pregunta2, id_usuario]);
+      console.log(quiz);
       quiz = quiz[0];
       numeroPregunta = 2;
 
@@ -62,15 +62,17 @@ app.get("/quiz/:idTrivia/:idUser", async (req, res) => {
         ) 
         LIMIT 1
         `;
-        console.log(query);
         quiz = await db.pool.query(query, [id_pregunta3, id_usuario]);
+        console.log(quiz);
         quiz = quiz[0];
         numeroPregunta = 3;
 
       }
     }
 
-    quiz[0].numeroPregunta = numeroPregunta;
+    if (quiz.length != 0) {
+      quiz[0].numeroPregunta = numeroPregunta;
+    }  
     res.status(200).json({ error: false, quiz });
 
   } catch (error) {
