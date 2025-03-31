@@ -20,7 +20,7 @@ app.get("/quiz/:idTrivia/:idUser", async (req, res) => {
     let quiz = await db.pool.query(query, [id_usuario, id_trivia]);
     quiz = quiz[0];
 
-    let numeroPregunta = 1;
+    let numeroPregunta = 0;
 
     const id_pregunta1 = quiz[0].id_preg1_conj;
     const id_pregunta2 = quiz[0].id_preg2_conj;
@@ -34,8 +34,10 @@ app.get("/quiz/:idTrivia/:idUser", async (req, res) => {
     ) 
     LIMIT 1
     `;
+    console.log(query);
     quiz = await db.pool.query(query, [id_pregunta1, id_usuario]);
     quiz = quiz[0];
+    numeroPregunta = 1;
 
     if (quiz.length == 0) {
       //pregunta 2
@@ -46,6 +48,7 @@ app.get("/quiz/:idTrivia/:idUser", async (req, res) => {
       ) 
       LIMIT 1
       `;
+      console.log(query);
       quiz = await db.pool.query(query, [id_pregunta2, id_usuario]);
       quiz = quiz[0];
       numeroPregunta = 2;
@@ -59,6 +62,7 @@ app.get("/quiz/:idTrivia/:idUser", async (req, res) => {
         ) 
         LIMIT 1
         `;
+        console.log(query);
         quiz = await db.pool.query(query, [id_pregunta3, id_usuario]);
         quiz = quiz[0];
         numeroPregunta = 3;
