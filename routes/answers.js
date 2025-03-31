@@ -5,13 +5,14 @@ const db = require("../config/db");
 
 
 //preguntas por id trivia y id_usuario
-app.get("/check/:idTrivia/:idUser/:idQuiz/:idAnswer", async (req, res) => {
+app.get("/check/:idTrivia/:idUser/:idQuiz/:idAnswer/:numQuestion", async (req, res) => {
   let id_trivia = req.params.idTrivia;
   let id_usuario = req.params.idUser;
   let id_pregunta = req.params.idQuiz;
   let id_respuesta = req.params.idAnswer;
+  let num_pregunta = req.params.numQuestion;
   
-  if (!id_trivia || !id_usuario || !id_pregunta || !id_respuesta) {
+  if (!id_trivia || !id_usuario || !id_pregunta || !id_respuesta || !num_pregunta) {
     return res.status(400).json({
       msg: "Faltan valores",
       error: true,
@@ -70,7 +71,7 @@ app.get("/check/:idTrivia/:idUser/:idQuiz/:idAnswer", async (req, res) => {
         await db.pool.query(query, values);
 
         //vemos si fue la ultima pregunta
-        if(id_pregunta % 3 === 0){
+        if(num_pregunta === 3){
 
            const updateQuery = `UPDATE conjunto_triv SET estatus_conj = 'contestada' WHERE id_user_conj = ? AND num_trivia = ?`;
            await db.pool.query(updateQuery, [id_usuario, id_trivia]);

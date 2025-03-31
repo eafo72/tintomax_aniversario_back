@@ -20,6 +20,8 @@ app.get("/quiz/:idTrivia/:idUser", async (req, res) => {
     let quiz = await db.pool.query(query, [id_usuario, id_trivia]);
     quiz = quiz[0];
 
+    let numeroPregunta = 1;
+
     const id_pregunta1 = quiz[0].id_preg1_conj;
     const id_pregunta2 = quiz[0].id_preg2_conj;
     const id_pregunta3 = quiz[0].id_preg3_conj;
@@ -46,6 +48,7 @@ app.get("/quiz/:idTrivia/:idUser", async (req, res) => {
       `;
       quiz = await db.pool.query(query, [id_pregunta2, id_usuario]);
       quiz = quiz[0];
+      numeroPregunta = 2;
 
       if (quiz.length == 0) {
         //pregunta 3
@@ -58,9 +61,12 @@ app.get("/quiz/:idTrivia/:idUser", async (req, res) => {
         `;
         quiz = await db.pool.query(query, [id_pregunta3, id_usuario]);
         quiz = quiz[0];
+        numeroPregunta = 3;
+        
       }
     }
 
+    quiz.numeroPregunta = numeroPregunta;
     res.status(200).json({ error: false, quiz });
 
   } catch (error) {
