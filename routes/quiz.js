@@ -16,24 +16,22 @@ app.get("/quiz/:idTrivia/:idUser", async (req, res) => {
     });
   }
 
-  //calculamos el primer id de pregunta
-  const startQuestionId = (Number(id_trivia) - 1) * 3 + 1;
-  const endQuestionId = startQuestionId + 2;
-
-   
+     
   try {
-    let query = `
-    SELECT preguntas.id_pregunta, preguntas.opcion_1_preg, preguntas.opcion_2_preg, preguntas.opcion_3_preg, preguntas.pregunta FROM preguntas 
-    WHERE id_pregunta >= ? 
-    AND id_pregunta <= ? 
+    let query = `SELECT * FROM conjunto_triv WHERE id_user_conj = ? AND num_trivia = ? AND estatus_conj = 'asignada'`;
+    let quiz = await db.pool.query(query, [id_usuario, id_trivia]);
+    quiz = quiz[0];
+
+
+    query = `SELECT preguntas.id_pregunta, preguntas.opcion_1_preg, preguntas.opcion_2_preg, preguntas.opcion_3_preg, preguntas.pregunta FROM preguntas 
+    WHERE id_pregunta = ? OR  id_pregunta = ? OR id_pregunta = ?
     AND id_pregunta NOT IN (
         SELECT id_preg_resp FROM respuestas WHERE id_usuario_resp = ?
     ) 
-    ORDER BY id_pregunta ASC 
     LIMIT 1
     `;
 
-    let quiz = await db.pool.query(query, [startQuestionId, endQuestionId, id_usuario]);
+    quiz = await db.pool.query(query, [quiz[0].id_preg1_conj, quiz[0].id_preg2_conj, quiz[0].id_preg3_conj, id_usuario]);
     quiz = quiz[0];
 
     res.status(200).json({ error: false, quiz });
