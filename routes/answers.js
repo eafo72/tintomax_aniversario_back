@@ -20,7 +20,11 @@ app.get("/check/:idTrivia/:idUser/:idQuiz/:idAnswer/:numQuestion", async (req, r
   }
 
   try {
-    
+    let tipo_pregunta = 'general';
+    if(num_pregunta == 3){
+      tipo_pregunta = 'max';
+    }
+
     let query = `SELECT * FROM preguntas WHERE id_pregunta = ?`;
     let answer = await db.pool.query(query, [id_pregunta]);
     answer = answer[0][0];
@@ -44,23 +48,22 @@ app.get("/check/:idTrivia/:idUser/:idQuiz/:idAnswer/:numQuestion", async (req, r
       totalPuntos = puntosporrespuestacorrecta;
     }
 
-
-
-
     query = `INSERT INTO respuestas 
          (id_usuario_resp,
           id_preg_resp,
+          tipo_preg_resp,
           id_conj_resp,
           id_cat_resp,
           opcion_selec_resp,
           correcta_resp,
           puntos_resp) 
           VALUES 
-          (?, ?, ?, ?, ?, ?, ?)`;
+          (?, ?, ?, ?, ?, ?, ?, ?)`;
     
         const values = [
           id_usuario,
           id_pregunta,
+          tipo_pregunta,
           id_trivia,
           puntosporrespuestacorrecta, 
           id_respuesta,

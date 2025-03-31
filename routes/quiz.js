@@ -51,10 +51,10 @@ app.get("/quiz/:idTrivia/:idUser", async (req, res) => {
       numeroPregunta = 2;
 
       if (quiz.length == 0) {
-        //pregunta 3
-        query = `SELECT preguntas.id_pregunta, preguntas.opcion_1_preg, preguntas.opcion_2_preg, preguntas.opcion_3_preg, preguntas.pregunta FROM preguntas 
-        WHERE id_pregunta = ?
-        AND id_pregunta NOT IN (
+        //pregunta 3 OJO es del la tabla preguntas_max
+        query = `SELECT preguntas_max.id_pregunta_max, preguntas_max.opcion_1_preg_max, preguntas_max.opcion_2_preg_max, preguntas_max.opcion_3_preg_max, preguntas_max.pregunta_max FROM preguntas_max 
+        WHERE id_pregunta_max = ?
+        AND id_pregunta_max NOT IN (
           SELECT id_preg_resp FROM respuestas WHERE id_usuario_resp = ?
         ) 
         LIMIT 1
@@ -62,7 +62,7 @@ app.get("/quiz/:idTrivia/:idUser", async (req, res) => {
         quiz = await db.pool.query(query, [id_pregunta3, id_usuario]);
         quiz = quiz[0];
         numeroPregunta = 3;
-        
+
       }
     }
 
