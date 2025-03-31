@@ -16,10 +16,10 @@ app.get("/quiz/:idTrivia/:idUser", async (req, res) => {
   }
 
   try {
-    let query = `SELECT * FROM conjunto_triv WHERE id_user_conj = ? AND num_trivia = ? AND estatus_conj = 'asignada'`;
+    let query = `SELECT * FROM conjunto_triv WHERE id_user_conj = ? AND num_trivia = ?`;
     let quiz = await db.pool.query(query, [id_usuario, id_trivia]);
     quiz = quiz[0];
-    
+
     const id_pregunta1 = quiz[0].id_preg1_conj;
     const id_pregunta2 = quiz[0].id_preg2_conj;
     const id_pregunta3 = quiz[0].id_preg3_conj;

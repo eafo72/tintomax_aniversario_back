@@ -719,7 +719,7 @@ app.get("/trivias/:id", async (req, res) => {
   }
 
   try {
-    let query = `SELECT * FROM conjunto_triv WHERE id_user_conj = ? AND (estatus_conj = 'asignada' OR estatus_conj = 'contestada')  `;
+    let query = `SELECT * FROM conjunto_triv WHERE id_user_conj = ? AND (estatus_conj = 'asignada' OR estatus_conj = 'contestada')`;
     let trivias = await db.pool.query(query, [userId]);
     trivias = trivias[0];
 
