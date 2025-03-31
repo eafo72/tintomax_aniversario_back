@@ -3,7 +3,6 @@ const express = require("express");
 const app = express.Router();
 const db = require("../config/db");
 
-
 //preguntas por id trivia y id_usuario
 app.get("/quiz/:idTrivia/:idUser", async (req, res) => {
   let id_trivia = req.params.idTrivia;
@@ -16,23 +15,47 @@ app.get("/quiz/:idTrivia/:idUser", async (req, res) => {
     });
   }
 
-     
   try {
     let query = `SELECT * FROM conjunto_triv WHERE id_user_conj = ? AND num_trivia = ? AND estatus_conj = 'asignada'`;
     let quiz = await db.pool.query(query, [id_usuario, id_trivia]);
     quiz = quiz[0];
 
-
+    //pregunta 1
     query = `SELECT preguntas.id_pregunta, preguntas.opcion_1_preg, preguntas.opcion_2_preg, preguntas.opcion_3_preg, preguntas.pregunta FROM preguntas 
-    WHERE id_pregunta = ? OR  id_pregunta = ? OR id_pregunta = ?
+    WHERE id_pregunta = ?
     AND id_pregunta NOT IN (
         SELECT id_preg_resp FROM respuestas WHERE id_usuario_resp = ?
     ) 
     LIMIT 1
     `;
-
-    quiz = await db.pool.query(query, [quiz[0].id_preg1_conj, quiz[0].id_preg2_conj, quiz[0].id_preg3_conj, id_usuario]);
+    quiz = await db.pool.query(query, [quiz[0].id_preg1_conj, id_usuario]);
     quiz = quiz[0];
+
+    if (quiz.length == 0) {
+      //pregunta 2
+      query = `SELECT preguntas.id_pregunta, preguntas.opcion_1_preg, preguntas.opcion_2_preg, preguntas.opcion_3_preg, preguntas.pregunta FROM preguntas 
+      WHERE id_pregunta = ?
+      AND id_pregunta NOT IN (
+        SELECT id_preg_resp FROM respuestas WHERE id_usuario_resp = ?
+      ) 
+      LIMIT 1
+      `;
+      quiz = await db.pool.query(query, [quiz[0].id_preg2_conj, id_usuario]);
+      quiz = quiz[0];
+
+      if (quiz.length == 0) {
+        //pregunta 3
+        query = `SELECT preguntas.id_pregunta, preguntas.opcion_1_preg, preguntas.opcion_2_preg, preguntas.opcion_3_preg, preguntas.pregunta FROM preguntas 
+        WHERE id_pregunta = ?
+        AND id_pregunta NOT IN (
+          SELECT id_preg_resp FROM respuestas WHERE id_usuario_resp = ?
+        ) 
+        LIMIT 1
+        `;
+        quiz = await db.pool.query(query, [quiz[0].id_preg3_conj, id_usuario]);
+        quiz = quiz[0];
+      }
+    }
 
     res.status(200).json({ error: false, quiz });
     
