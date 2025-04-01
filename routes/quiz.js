@@ -81,4 +81,53 @@ app.get("/quiz/:idTrivia/:idUser", async (req, res) => {
   }
 });
 
+app.get("/result/:idTrivia/:idUser", async (req, res) => {
+  let id_trivia = req.params.idTrivia;
+  let id_usuario = req.params.idUser;
+
+  if (!id_trivia || !id_usuario) {
+    return res.status(400).json({
+      msg: "Faltan valores",
+      error: true,
+    });
+  }
+
+  try {
+    let query = `SELECT * FROM conjunto_triv WHERE id_user_conj = ? AND num_trivia = ?`;
+    let res = await db.pool.query(query, [id_usuario, id_trivia]);
+    res = res[0];
+    
+
+    const id_pregunta1 = res[0].id_preg1_conj;
+    const id_pregunta2 = res[0].id_preg2_conj;
+    const id_pregunta3 = res[0].id_preg3_conj;
+
+    let quiz = []; // Array para almacenar todas las preguntas
+
+    //pregunta 1
+    query = `SELECT * FROM preguntas INNER JOIN respuestas ON preguntas.id_pregunta = respuestas.id_preg_resp WHERE pregunta.id_pregunta = ? AND respuestas.id_usuario_resp = ?`;
+    let resultado1 = await db.pool.query(query, [id_pregunta1, id_usuario]);
+    resultado1 = resultado1[0];
+    if (resultado1.length > 0) {
+      quiz = quiz.concat(resultado1); // Agregamos los resultados al array sin sobrescribirlo
+    }
+
+    //pregunta 2
+    query = `SELECT * FROM preguntas INNER JOIN respuestas ON preguntas.id_pregunta = respuestas.id_preg_resp WHERE pregunta.id_pregunta = ? AND respuestas.id_usuario_resp = ?`;
+    let resultado2 = await db.pool.query(query, [id_pregunta2, id_usuario]);
+    resultado2 = resultado2[0];
+    if (resultado2.length > 0) {
+      quiz = quiz.concat(resultado2); // Agregamos los resultados al array sin sobrescribirlo
+    }
+       
+    res.status(200).json({ error: false, quiz });
+
+  } catch (error) {
+    res.status(500).json({
+      msg: "Hubo un error obteniendo los datos",
+      error: true,
+      details: error,
+    });
+  }
+});
 module.exports = app;
