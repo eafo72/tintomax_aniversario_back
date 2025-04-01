@@ -699,7 +699,6 @@ app.post("/registrarTicket", async (req, res) => {
       nextTrivia: trivia_nueva,
       ticketId: result.insertId,
     });
-
   } catch (error) {
     console.error("Error inesperado:", error);
     res
@@ -719,7 +718,19 @@ app.get("/trivias/:id", async (req, res) => {
   }
 
   try {
-    let query = `SELECT * FROM conjunto_triv WHERE id_user_conj = ? AND (estatus_conj = 'asignada' OR estatus_conj = 'contestada')`;
+    //let query = `SELECT * FROM conjunto_triv WHERE id_user_conj = ? AND (estatus_conj = 'asignada' OR estatus_conj = 'contestada')`;
+    let query = `SELECT 
+    ct.num_trivia,
+    ct.id_user_conj,
+    COALESCE(SUM(r.puntos_resp), 0) AS total_puntos
+    FROM conjunto_triv ct
+    LEFT JOIN respuestas r 
+    ON ct.id_user_conj = r.id_usuario_resp 
+    AND ct.num_trivia = r.id_conj_resp
+    WHERE ct.id_user_conj = ? 
+    AND (ct.estatus_conj = 'asignada' OR ct.estatus_conj = 'contestada')
+    GROUP BY ct.num_trivia, ct.id_user_conj`;
+
     let trivias = await db.pool.query(query, [userId]);
     trivias = trivias[0];
 
