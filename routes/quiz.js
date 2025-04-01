@@ -111,7 +111,14 @@ app.get("/result/:idTrivia/:idUser", async (req, res) => {
     //pregunta 2
     query = `SELECT * FROM preguntas INNER JOIN respuestas ON preguntas.id_pregunta = respuestas.id_preg_resp WHERE preguntas.id_pregunta = ? AND respuestas.id_usuario_resp = ?`;
     let resultado2 = await db.pool.query(query, [id_pregunta2, id_usuario]);
-    resultado2.forEach(row => quiz.push(row));
+    //resultado2.forEach(row => quiz.push(row));
+    quiz.push(resultado2[0]);
+
+    //pregunta 3
+    query = `SELECT * FROM preguntas_max INNER JOIN respuestas ON preguntas_max.id_pregunta_max = respuestas.id_preg_resp WHERE preguntas_max.id_pregunta_max = ? AND respuestas.id_usuario_resp = ?`;
+    let resultado3 = await db.pool.query(query, [id_pregunta3, id_usuario]);
+    //resultado3.forEach(row => quiz.push(row));
+    quiz.push(resultado3[0]);
 
        
 res.status(200).json({ error: false, quiz });  
