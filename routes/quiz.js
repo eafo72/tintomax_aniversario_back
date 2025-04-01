@@ -94,10 +94,10 @@ app.get("/result/:idTrivia/:idUser", async (req, res) => {
 
   try {
     let query = `SELECT * FROM conjunto_triv WHERE id_user_conj = ? AND num_trivia = ?`;
-    let res = await db.pool.query(query, [id_usuario, id_trivia]);
-    res = res[0];
+    let res1 = await db.pool.query(query, [id_usuario, id_trivia]);
+    res1 = res1[0];
 
-    res.status(200).json({ error: false, res });
+    res.status(200).json({ error: false, res1 });
     
 /*
     const id_pregunta1 = res[0].id_preg1_conj;
