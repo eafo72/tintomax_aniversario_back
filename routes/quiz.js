@@ -107,12 +107,12 @@ app.get("/result/:idTrivia/:idUser", async (req, res) => {
     let quiz = await db.pool.query(query, [id_pregunta1, id_usuario]);
     quiz = quiz[0];
     
-/*
+
     //pregunta 2
     query = `SELECT * FROM preguntas INNER JOIN respuestas ON preguntas.id_pregunta = respuestas.id_preg_resp WHERE preguntas.id_pregunta = ? AND respuestas.id_usuario_resp = ?`;
     let resultado2 = await db.pool.query(query, [id_pregunta2, id_usuario]);
     resultado2.forEach(row => quiz.push(row));
-*/
+
        
 res.status(200).json({ error: false, quiz });  
 
