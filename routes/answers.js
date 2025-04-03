@@ -97,7 +97,7 @@ app.get("/check/:idTrivia/:idUser/:idQuiz/:idAnswer/:numQuestion", async (req, r
         }
 
 
-    res.status(200).json({ error: false, resultado });
+    res.status(200).json({ error: false, resultado, totalPuntos });
     
     
   } catch (error) {
