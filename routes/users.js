@@ -720,8 +720,7 @@ app.get("/trivias/:id", async (req, res) => {
   try {
     //let query = `SELECT * FROM conjunto_triv WHERE id_user_conj = ? AND (estatus_conj = 'asignada' OR estatus_conj = 'contestada')`;
     let query = `SELECT 
-    ct.num_trivia,
-    ct.id_user_conj,
+    ct.*,
     COALESCE(SUM(r.puntos_resp), 0) AS total_puntos
     FROM conjunto_triv ct
     LEFT JOIN respuestas r 
