@@ -664,7 +664,7 @@ app.post("/registrarTicket", async (req, res) => {
     if (puntos > 0) {
       //buscamos la ultima trivia del usuario
       const [rows] = await db.pool.query(
-        `SELECT num_trivia FROM conjunto_triv WHERE id_user_conj = ? AND estatus_conj = 'asignada' ORDER BY num_trivia DESC LIMIT 1`,
+        `SELECT num_trivia FROM conjunto_triv WHERE id_user_conj = ? AND (estatus_conj = 'asignada' OR estatus_conj = 'contestada') ORDER BY num_trivia DESC LIMIT 1`,
         [idCliente]
       );
 
