@@ -116,7 +116,7 @@ app.get("/result/:idTrivia/:idUser", async (req, res) => {
     quiz.push(resultado2[0][0]);
 
     //pregunta 3
-    query = `SELECT * FROM preguntas_max INNER JOIN respuestas ON preguntas_max.id_pregunta_max = respuestas.id_preg_resp WHERE preguntas_max.id_pregunta_max = ? AND respuestas.id_usuario_resp = ?`;
+    query = `SELECT * FROM preguntas_max INNER JOIN respuestas ON preguntas_max.id_pregunta_max = respuestas.id_preg_resp WHERE preguntas_max.id_pregunta_max = ? AND respuestas.id_usuario_resp = ? AND respuestas.tipo_preg_resp = 'max'`;
     let resultado3 = await db.pool.query(query, [id_pregunta3, id_usuario]);
     //resultado3.forEach(row => quiz.push(row));
     quiz.push(resultado3[0][0]);
