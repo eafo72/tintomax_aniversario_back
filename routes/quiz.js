@@ -56,7 +56,7 @@ app.get("/quiz/:idTrivia/:idUser", async (req, res) => {
         query = `SELECT preguntas_max.id_pregunta_max, preguntas_max.opcion_1_preg_max, preguntas_max.opcion_2_preg_max, preguntas_max.opcion_3_preg_max, preguntas_max.pregunta_max FROM preguntas_max 
         WHERE id_pregunta_max = ?
         AND id_pregunta_max NOT IN (
-          SELECT id_preg_resp FROM respuestas WHERE id_usuario_resp = ?
+          SELECT id_preg_resp FROM respuestas WHERE id_usuario_resp = ? AND tipo_preg_resp = 'max'
         ) 
         LIMIT 1
         `;
