@@ -254,6 +254,7 @@ app.post("/login", async (req, res) => {
         nombre: user.nombre_usur,
         correo: user.correo_usur,
         acumulado: user.acumulado_usur,
+        ranking: user.ranking_usur,
         estatus: user.estatus_usur,
       },
     };
