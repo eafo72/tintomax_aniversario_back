@@ -100,6 +100,19 @@ app.get("/check/:idTrivia/:idUser/:idQuiz/:idAnswer/:numQuestion", async (req, r
         if(totalPuntos > 0){
           const updateQuery = `UPDATE usuarios SET acumulado_usur = acumulado_usur + ? WHERE id_usuario = ?`;
           await db.pool.query(updateQuery, [totalPuntos,id_usuario]);
+ 
+          //Actualizar el ranking
+          const updateRankingQuery = `
+            UPDATE usuarios 
+            JOIN (SELECT id_usuario, 
+               RANK() OVER (ORDER BY acumulado_usur DESC) AS nueva_posicion
+               FROM usuarios) AS ranking 
+               ON usuarios.id_usuario = ranking.id_usuario
+            SET usuarios.ranking_usur = ranking.nueva_posicion;
+          `;
+
+          await db.pool.query(updateRankingQuery);
+
         }
 
 
