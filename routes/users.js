@@ -744,4 +744,26 @@ app.get("/trivias/:id", async (req, res) => {
   }
 });
 
+app.get("/rank3", async (req, res) => {
+  try {
+    let query = `SELECT 
+		nombre_usur,
+		acumulado_usur,
+    ranking_usur
+    FROM usuarios ORDER BY ranking_usur ASC LIMIT 3
+        `;
+    let rank3 = await db.pool.query(query);
+    rank3 = rank3[0];
+
+    res.status(200).json({ error: false, rank3 });
+
+  } catch (error) {
+    res.status(500).json({
+      msg: "Hubo un error obteniendo los datos",
+      error: true,
+      details: error,
+    });
+  }
+});
+
 module.exports = app;
