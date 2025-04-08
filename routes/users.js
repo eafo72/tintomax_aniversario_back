@@ -744,18 +744,18 @@ app.get("/trivias/:id", async (req, res) => {
   }
 });
 
-app.get("/rank3", async (req, res) => {
+app.get("/rank5", async (req, res) => {
   try {
     let query = `SELECT 
 		nombre_usur,
 		acumulado_usur,
     ranking_usur
-    FROM usuarios WHERE tipo_usur = 'Cliente' ORDER BY ranking_usur ASC LIMIT 3
+    FROM usuarios WHERE tipo_usur = 'Cliente' ORDER BY ranking_usur ASC LIMIT 5
         `;
-    let rank3 = await db.pool.query(query);
-    rank3 = rank3[0];
+    let rank5 = await db.pool.query(query);
+    rank5 = rank5[0];
 
-    res.status(200).json({ error: false, rank3 });
+    res.status(200).json({ error: false, rank5 });
 
   } catch (error) {
     res.status(500).json({
