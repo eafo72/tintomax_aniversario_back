@@ -794,7 +794,7 @@ app.get("/rankPosition/:id", async (req, res) => {
 		nombre_usur,
 		acumulado_usur,
     ranking_usur
-    FROM usuarios WHERE tipo_usur = 'Cliente' AND acumulado_usur != null AND ranking_usur <= ? ORDER BY ranking_usur DESC LIMIT 1`;
+    FROM usuarios WHERE tipo_usur = 'Cliente' AND acumulado_usur IS NOT NULL AND ranking_usur <= ? ORDER BY ranking_usur DESC LIMIT 1`;
     let upPosition = await db.pool.query(query, [myRank]);
     upPosition = upPosition[0];
 
@@ -803,7 +803,7 @@ app.get("/rankPosition/:id", async (req, res) => {
 		nombre_usur,
 		acumulado_usur,
     ranking_usur
-    FROM usuarios WHERE tipo_usur = 'Cliente' AND acumulado_usur != null AND ranking_usur >= ? ORDER BY ranking_usur ASC LIMIT 1`;
+    FROM usuarios WHERE tipo_usur = 'Cliente' AND acumulado_usur IS NOT NULL AND ranking_usur >= ? ORDER BY ranking_usur ASC LIMIT 1`;
     let downPosition = await db.pool.query(query, [myRank]);
     downPosition = downPosition[0];
 
