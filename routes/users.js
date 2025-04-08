@@ -766,4 +766,57 @@ app.get("/rank5", async (req, res) => {
   }
 });
 
+app.get("/rankPosition/:id", async (req, res) => {
+  let userId = req.params.id;
+
+  if (!userId) {
+    return res.status(400).json({
+      msg: "El id debe de tener algun valor",
+      error: true,
+    });
+  }
+
+  try {
+
+    //my position
+    let query = `SELECT 
+		nombre_usur,
+		acumulado_usur,
+    ranking_usur
+    FROM usuarios WHERE tipo_usur = 'Cliente' AND id_usuario = ?`;
+    
+    let myPosition = await db.pool.query(query, [userId]);
+    myPosition = myPosition[0];
+    const myRank = myPosition[0].ranking_usur;
+
+    //one position up
+    query = `SELECT 
+		nombre_usur,
+		acumulado_usur,
+    ranking_usur
+    FROM usuarios WHERE tipo_usur = 'Cliente' AND ranking_usur > ? ORDER BY ranking_usur ASC LIMIT 1`;
+    let upPosition = await db.pool.query(query, [myRank]);
+    upPosition = upPosition[0];
+
+    //one position down
+    query = `SELECT 
+		nombre_usur,
+		acumulado_usur,
+    ranking_usur
+    FROM usuarios WHERE tipo_usur = 'Cliente' AND ranking_usur < ? ORDER BY ranking_usur ASC LIMIT 1`;
+    let downPosition = await db.pool.query(query, [myRank]);
+    downPosition = downPosition[0];
+
+
+    res.status(200).json({ error: false, myPosition, upPosition, downPosition });
+
+  } catch (error) {
+    res.status(500).json({
+      msg: "Hubo un error obteniendo los datos",
+      error: true,
+      details: error,
+    });
+  }
+});
+
 module.exports = app;
