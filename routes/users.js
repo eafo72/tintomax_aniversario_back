@@ -135,7 +135,7 @@ app.post("/crear", async (req, res) => {
 	    created_at,
 	    updated_at) 
 	    VALUES 
-	    (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
+	    (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
 
     const values = [
       nombre_usur,
