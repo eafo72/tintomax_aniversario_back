@@ -211,7 +211,7 @@ app.post("/crear", async (req, res) => {
     console.log(error);
     return res.status(400).json({
       error: true,
-      msg: error,
+      msg: error.response,
     });
   }
 });
