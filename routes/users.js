@@ -50,6 +50,7 @@ app.post("/crear", async (req, res) => {
       forma_usur,
       pass,
       tipo_usur,
+      id_sucursal,
     } = req.body; // OBTENER USUARIO, EMAIL Y PASSWORD DE LA PETICIÓN
 
     let errors = Array();
@@ -69,6 +70,11 @@ app.post("/crear", async (req, res) => {
     if (!tipo_usur) {
       errors.push({
         msg: "El campo tipo de usuario debe de contener un valor",
+      });
+    }
+    if (!id_sucursal) {
+      errors.push({
+        msg: "El campo id sucursal debe de contener un valor",
       });
     }
 
@@ -125,6 +131,7 @@ app.post("/crear", async (req, res) => {
       pass,
       tipo_usur,
       estatus_usur,
+      id_sucursal,
 	    created_at,
 	    updated_at) 
 	    VALUES 
@@ -139,6 +146,7 @@ app.post("/crear", async (req, res) => {
       hashedPassword,
       tipo_usur,
       "registrado",
+      id_sucursal,
       fecha,
       fecha,
     ];
