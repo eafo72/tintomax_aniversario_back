@@ -774,6 +774,37 @@ app.get("/rank5", async (req, res) => {
   }
 });
 
+app.get("/rank5Store/:id", async (req, res) => {
+  let storeId = req.params.id;
+
+  if (!storeId) {
+    return res.status(400).json({
+      msg: "El id debe de tener algun valor",
+      error: true,
+    });
+  }
+
+  try {
+    let query = `SELECT 
+		nombre_usur,
+		acumulado_usur,
+    ranking_usur
+    FROM usuarios WHERE tipo_usur = 'Cliente' AND acumulado_usur IS NOT NULL AND id_sucursal = ? ORDER BY ranking_usur ASC LIMIT 5
+        `;
+    let rank5Store = await db.pool.query(query,[storeId]);
+    rank5Store = rank5Store[0];
+
+    res.status(200).json({ error: false, rank5Store });
+
+  } catch (error) {
+    res.status(500).json({
+      msg: "Hubo un error obteniendo los datos",
+      error: true,
+      details: error,
+    });
+  }
+});
+
 app.get("/rankPosition/:id", async (req, res) => {
   let userId = req.params.id;
 
@@ -817,6 +848,66 @@ app.get("/rankPosition/:id", async (req, res) => {
 
 
     res.status(200).json({ error: false, myPosition, upPosition, downPosition });
+
+  } catch (error) {
+    res.status(500).json({
+      msg: "Hubo un error obteniendo los datos",
+      error: true,
+      details: error,
+    });
+  }
+});
+
+app.get("/rankPositionStore/:id/:idSucursal", async (req, res) => {
+  let userId = req.params.id;
+  let storeId = req.params.idSucursal;
+
+  if (!userId) {
+    return res.status(400).json({
+      msg: "El id debe de tener algun valor",
+      error: true,
+    });
+  }
+  if (!storeId) {
+    return res.status(400).json({
+      msg: "El idSucursal debe de tener algun valor",
+      error: true,
+    });
+  }
+
+  try {
+
+    //my position
+    let query = `SELECT 
+		nombre_usur,
+		acumulado_usur,
+    ranking_usur
+    FROM usuarios WHERE tipo_usur = 'Cliente' AND id_usuario = ? AND id_sucursal = ?`;
+    
+    let myPosition = await db.pool.query(query, [userId, storeId]);
+    myPosition = myPosition[0];
+    const myRank = myPosition[0].ranking_usur;
+
+    //one position up
+    query = `SELECT 
+		nombre_usur,
+		acumulado_usur,
+    ranking_usur
+    FROM usuarios WHERE tipo_usur = 'Cliente' AND acumulado_usur IS NOT NULL AND ranking_usur < ? AND id_sucursal = ? ORDER BY ranking_usur DESC LIMIT 1`;
+    let upPosition = await db.pool.query(query, [myRank, storeId]);
+    upPosition = upPosition[0];
+
+    //one position down
+    query = `SELECT 
+		nombre_usur,
+		acumulado_usur,
+    ranking_usur
+    FROM usuarios WHERE tipo_usur = 'Cliente' AND acumulado_usur IS NOT NULL AND ranking_usur > ? AND id_sucursal = ? ORDER BY ranking_usur ASC LIMIT 1`;
+    let downPosition = await db.pool.query(query, [myRank, storeId]);
+    downPosition = downPosition[0];
+
+
+    res.status(200).json({ error: false, myPositionStore:myPosition, upPositionStore:upPosition, downPositionStore:downPosition });
 
   } catch (error) {
     res.status(500).json({
