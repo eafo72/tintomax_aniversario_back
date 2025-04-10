@@ -791,7 +791,7 @@ app.get("/rank5Store/:id", async (req, res) => {
     ranking_usur
     FROM usuarios WHERE tipo_usur = 'Cliente' AND acumulado_usur IS NOT NULL AND id_sucursal = ? ORDER BY ranking_usur ASC LIMIT 5
         `;
-    let rank5Store = await db.pool.query(query,[storeId]);
+    let rank5Store = await db.pool.query(query, [storeId]);
     rank5Store = rank5Store[0];
 
     res.status(200).json({ error: false, rank5Store });
@@ -823,7 +823,7 @@ app.get("/rankPosition/:id", async (req, res) => {
 		acumulado_usur,
     ranking_usur
     FROM usuarios WHERE tipo_usur = 'Cliente' AND id_usuario = ?`;
-    
+
     let myPosition = await db.pool.query(query, [userId]);
     myPosition = myPosition[0];
     const myRank = myPosition[0].ranking_usur;
@@ -876,38 +876,74 @@ app.get("/rankPositionStore/:id/:idSucursal", async (req, res) => {
   }
 
   try {
-
+    //ojo aca se calcula el ranking no se toma de la BD
     //my position
-    let query = `SELECT 
-		nombre_usur,
-		acumulado_usur,
-    ranking_usur
-    FROM usuarios WHERE tipo_usur = 'Cliente' AND id_usuario = ? AND id_sucursal = ?`;
-    
-    let myPosition = await db.pool.query(query, [userId, storeId]);
+    let query = `
+    SELECT 
+    id_usuario,
+    nombre_usur,
+    acumulado_usur,
+    ranking
+    FROM (
+      SELECT 
+        id_usuario,
+        nombre_usur,
+        acumulado_usur,
+        ROW_NUMBER() OVER (ORDER BY acumulado_usur DESC) AS ranking
+      FROM usuarios
+      WHERE tipo_usur = 'Cliente' AND acumulado_usur IS NOT NULL AND id_sucursal = ?
+    ) AS subquery
+    WHERE id_usuario = ?
+    `;
+
+    let myPosition = await db.pool.query(query, [storeId, userId]);
     myPosition = myPosition[0];
-    const myRank = myPosition[0].ranking_usur;
+    const myRanking = myPosition[0].ranking;
 
     //one position up
     query = `SELECT 
-		nombre_usur,
-		acumulado_usur,
-    ranking_usur
-    FROM usuarios WHERE tipo_usur = 'Cliente' AND acumulado_usur IS NOT NULL AND ranking_usur < ? AND id_sucursal = ? ORDER BY ranking_usur DESC LIMIT 1`;
-    let upPosition = await db.pool.query(query, [myRank, storeId]);
+    id_usuario,
+    nombre_usur,
+    acumulado_usur,
+    ranking
+    FROM (
+      SELECT 
+        id_usuario,
+        nombre_usur,
+        acumulado_usur,
+        ROW_NUMBER() OVER (ORDER BY acumulado_usur DESC) AS ranking
+      FROM usuarios
+      WHERE tipo_usur = 'Cliente' AND acumulado_usur IS NOT NULL AND id_sucursal = ?
+    ) AS subquery
+    WHERE ranking = ?`;
+
+    let rankAbove = myRanking - 1;
+    let upPosition = await db.pool.query(query, [storeId,rankAbove]);
     upPosition = upPosition[0];
 
     //one position down
     query = `SELECT 
-		nombre_usur,
-		acumulado_usur,
-    ranking_usur
-    FROM usuarios WHERE tipo_usur = 'Cliente' AND acumulado_usur IS NOT NULL AND ranking_usur > ? AND id_sucursal = ? ORDER BY ranking_usur ASC LIMIT 1`;
-    let downPosition = await db.pool.query(query, [myRank, storeId]);
+    id_usuario,
+    nombre_usur,
+    acumulado_usur,
+    ranking
+    FROM (
+      SELECT 
+        id_usuario,
+        nombre_usur,
+        acumulado_usur,
+        ROW_NUMBER() OVER (ORDER BY acumulado_usur DESC) AS ranking
+      FROM usuarios
+      WHERE tipo_usur = 'Cliente' AND acumulado_usur IS NOT NULL AND id_sucursal = ?
+    ) AS subquery
+    WHERE ranking = ?`;
+
+    let rankBelow = myRanking + 1;
+    let downPosition = await db.pool.query(query, [storeId, rankBelow]);
     downPosition = downPosition[0];
 
 
-    res.status(200).json({ error: false, myPositionStore:myPosition, upPositionStore:upPosition, downPositionStore:downPosition });
+    res.status(200).json({ error: false, myPositionStore: myPosition, upPositionStore: upPosition, downPositionStore: downPosition });
 
   } catch (error) {
     res.status(500).json({
