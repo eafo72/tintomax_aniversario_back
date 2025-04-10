@@ -395,7 +395,7 @@ app.post("/verificar", auth, async (req, res) => {
 
     // Consultamos la base de datos para obtener los datos del usuario (excluyendo la contraseña)
     const [rows] = await db.pool.query(
-      "SELECT id_usuario, nombre_usur, correo_usur, acumulado_usur, ranking_usur, estatus_usur, id_sucursal FROM usuarios WHERE id_usuario = ?",
+      "SELECT id_usuario, nombre_usur, correo_usur, tel_usur, acumulado_usur, ranking_usur, estatus_usur, id_sucursal FROM usuarios WHERE id_usuario = ?",
       [userId]
     );
 
