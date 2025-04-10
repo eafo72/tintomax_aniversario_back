@@ -758,7 +758,7 @@ app.get("/rank5", async (req, res) => {
 		nombre_usur,
 		acumulado_usur,
     ranking_usur
-    FROM usuarios WHERE tipo_usur = 'Cliente' ORDER BY ranking_usur ASC LIMIT 5
+    FROM usuarios WHERE tipo_usur = 'Cliente' AND acumulado_usur IS NOT NULL ORDER BY ranking_usur ASC LIMIT 5
         `;
     let rank5 = await db.pool.query(query);
     rank5 = rank5[0];
