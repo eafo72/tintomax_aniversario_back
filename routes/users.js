@@ -268,9 +268,9 @@ app.post("/login", async (req, res) => {
     };
 
     let goToUrl = "";
-    if(user.tipo_usur == "Cliente"){
+    if (user.tipo_usur == "Cliente") {
       goToUrl = "inicio.html";
-    }else if(user.tipo_usur == "Colaborador"){
+    } else if (user.tipo_usur == "Colaborador") {
       goToUrl = "upload_ticket.html";
     }
 
@@ -283,11 +283,11 @@ app.post("/login", async (req, res) => {
         (error, token) => {
           if (error) throw error;
 
-          if(goToUrl == ''){
-            res.json({ error: true, msg: "Lo sentimos, necesitas ser cliente o colaborador para tener acceso."});
-          }else{
+          if (goToUrl == '') {
+            res.json({ error: true, msg: "Lo sentimos, necesitas ser cliente o colaborador para tener acceso." });
+          } else {
             res.status(200).json({ error: false, token: token, goToUrl });
-          }  
+          }
         }
       );
     } else {
@@ -615,6 +615,45 @@ app.post("/registrarTicket", async (req, res) => {
         .json({ error: true, msg: "Faltan datos requeridos" });
     }
 
+    //vemos si existe el id del cliente
+    let selectQuery = `SELECT id_usuario FROM usuarios WHERE id_usuario = ? AND tipo_usur = "Cliente"`;
+    let [rows] = await db.pool.query(selectQuery, [idCliente]);
+
+    if (rows.length === 0) {
+      return res
+        .status(404)
+        .json({ error: true, msg: "Cliente no encontrado" });
+    }
+
+    //vemos si existe el id del colaborador
+    selectQuery = `SELECT id_usuario FROM usuarios WHERE id_usuario = ? AND tipo_usur = "Colaborador"`;
+    [rows] = await db.pool.query(selectQuery, [idVendedor]);
+
+    if (rows.length === 0) {
+      return res
+        .status(404)
+        .json({ error: true, msg: "Colaborador no encontrado" });
+    }
+
+    //vemos si existe el id del sucursal
+    selectQuery = `SELECT idSucursal FROM sucursales WHERE idSucursal = ?`;
+    [rows] = await db.pool.query(selectQuery, [idUnidad]);
+
+    if (rows.length === 0) {
+      return res
+        .status(404)
+        .json({ error: true, msg: "Sucursal no encontrada" });
+    }
+
+    //vemos si existe el id de compra de esa sucursal
+    selectQuery = `SELECT id_compra FROM compras WHERE id_unidad_comp = ? AND nota_comp = ?`;
+    [rows] = await db.pool.query(selectQuery, [idUnidad, numeroNota]);
+    if (rows.length > 0) {
+      return res
+        .status(404)
+        .json({ error: true, msg: "La nota ya fue registrada" });
+    }
+
     // Subir imagen a Cloudinary
     const uploadResponse = await cloudinary.uploader.upload(fotoTicket, {
       folder: "imagenes", // Carpeta donde se guardará en Cloudinary
@@ -929,7 +968,7 @@ app.get("/rankPositionStore/:id/:idSucursal", async (req, res) => {
     WHERE ranking = ?`;
 
     let rankAbove = myRanking - 1;
-    let upPosition = await db.pool.query(query, [storeId,rankAbove]);
+    let upPosition = await db.pool.query(query, [storeId, rankAbove]);
     upPosition = upPosition[0];
 
     //one position down
