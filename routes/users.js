@@ -655,11 +655,18 @@ app.post("/registrarTicket", async (req, res) => {
     }
 
     // Subir imagen a Cloudinary
-    const uploadResponse = await cloudinary.uploader.upload(fotoTicket, {
-      folder: "imagenes", // Carpeta donde se guardará en Cloudinary
-      resource_type: "image",
-    });
-    const imageUrl = uploadResponse.secure_url;
+    try {
+      const uploadResponse = await cloudinary.uploader.upload(fotoTicket, {
+        folder: "imagenes",
+        resource_type: "image",
+      });
+      const imageUrl = uploadResponse.secure_url;
+      
+    } catch (error) {
+      return res
+        .status(404)
+        .json({ error: true, msg: "Error al subir a Cloudinary:", error });
+    }
 
     let trivia = 0;
     let puntos = 0;
