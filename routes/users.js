@@ -654,19 +654,23 @@ app.post("/registrarTicket", async (req, res) => {
         .json({ error: true, msg: "La nota ya fue registrada" });
     }
 
+    let imageUrl = "";
+
+    /*
     // Subir imagen a Cloudinary
     try {
       const uploadResponse = await cloudinary.uploader.upload(fotoTicket, {
         folder: "imagenes",
         resource_type: "image",
       });
-      const imageUrl = uploadResponse.secure_url;
+      imageUrl = uploadResponse.secure_url;
       
     } catch (error) {
       return res
         .status(404)
         .json({ error: true, msg: "Error al subir a Cloudinary:", error });
     }
+        */
 
     let trivia = 0;
     let puntos = 0;
