@@ -267,6 +267,13 @@ app.post("/login", async (req, res) => {
       },
     };
 
+    let goToUrl = "";
+    if(user.tipo_usur == "Cliente"){
+      goToUrl = "inicio.html";
+    }else if(user.tipo_usur == "Colaborador"){
+      goToUrl = "upload_ticket.html";
+    }
+
     //firma del jwt  3600000 = 1hora
     if (email && passCorrecto) {
       jwt.sign(
@@ -276,7 +283,11 @@ app.post("/login", async (req, res) => {
         (error, token) => {
           if (error) throw error;
 
-          res.status(200).json({ error: false, token: token });
+          if(goToUrl == ''){
+            res.json({ error: true, msg: "Lo sentimos, necesitas ser cliente o colaborador para tener acceso."});
+          }else{
+            res.status(200).json({ error: false, token: token, goToUrl });
+          }  
         }
       );
     } else {
@@ -395,7 +406,7 @@ app.post("/verificar", auth, async (req, res) => {
 
     // Consultamos la base de datos para obtener los datos del usuario (excluyendo la contraseña)
     const [rows] = await db.pool.query(
-      "SELECT id_usuario, nombre_usur, correo_usur, tel_usur, acumulado_usur, ranking_usur, estatus_usur, id_sucursal FROM usuarios WHERE id_usuario = ?",
+      "SELECT id_usuario, nombre_usur, correo_usur, tel_usur, acumulado_usur, tipo_usur, estatus_usur, ranking_usur, id_sucursal FROM usuarios WHERE id_usuario = ?",
       [userId]
     );
 
