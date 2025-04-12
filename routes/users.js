@@ -757,7 +757,7 @@ app.post("/registrarTicket", upload.single("fotoTicket"), async (req, res) => {
                     id_unid_conj = ?, 
                     cat_conj = ?, 
                     estatus_conj = ?
-                WHERE num_trivia = ?`;
+                WHERE num_trivia = ? AND id_user_conj = ?`;
 
       const values2 = [
         result.insertId,
@@ -765,6 +765,7 @@ app.post("/registrarTicket", upload.single("fotoTicket"), async (req, res) => {
         puntos,
         "asignada",
         trivia_nueva,
+        idCliente
       ];
 
       let result2 = await db.pool.query(query2, values2);
