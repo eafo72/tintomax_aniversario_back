@@ -682,7 +682,7 @@ app.post("/registrarTicket", upload.single("fotoTicket"), async (req, res) => {
       const result = await uploadToCloudinary(req.file.buffer);
       imageUrl = result.secure_url;
     } catch (error) {
-      return res.status(500).json({ error: true, msg: "Error al subir imagen" });
+      return res.status(500).json({ error: true, msg: "Error al subir imagen",error });
     }
 
 
