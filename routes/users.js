@@ -661,6 +661,16 @@ app.post("/registrarTicket", upload.single("fotoTicket"), async (req, res) => {
     }
 
 
+    //vemos si existe el id de sucursal corresponde al cliente
+    selectQuery = `SELECT id_usuario FROM usuarios WHERE id_usuario = ? AND id_sucursal = ?`;
+    [rows] = await db.pool.query(selectQuery, [idCliente, idUnidad]);
+
+    if (rows.length === 0) {
+      return res
+        .status(404)
+        .json({ error: true, msg: "La sucursal seleccionada no le corresponde al Cliente" });
+    }
+
     // Subir imagen a Cloudinary desde buffer
     const uploadFromBuffer = () => {
       return new Promise((resolve, reject) => {

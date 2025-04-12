@@ -98,7 +98,7 @@ app.get("/check/:idTrivia/:idUser/:idQuiz/:idAnswer/:numQuestion", async (req, r
 
         //agregar los puntos ganados al usuario
         if(totalPuntos > 0){
-          const updateQuery = `UPDATE usuarios SET acumulado_usur = acumulado_usur + ? WHERE id_usuario = ?`;
+          const updateQuery = `UPDATE usuarios SET acumulado_usur = COALESCE(acumulado_usur, 0) + ? WHERE id_usuario = ?`;
           await db.pool.query(updateQuery, [totalPuntos,id_usuario]);
  
           //Actualizar el ranking
