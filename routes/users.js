@@ -6,8 +6,31 @@ const jwt = require("jsonwebtoken");
 const auth = require("../middlewares/authorization");
 const db = require("../config/db");
 const mailer = require("../controller/mailController");
-const cloudinary = require("../config/cloudinaryConfig");
+
+const cloudinary = require('cloudinary').v2;
+const streamifier = require('streamifier'); // para convertir buffer en stream
+
 const bodyParser = require("body-parser");
+
+const multer = require("multer");
+const storage = multer.memoryStorage(); // guardamos en memoria, útil para subir a Cloudinary
+const upload = multer({ storage });
+
+function uploadToCloudinary(buffer) {
+  return new Promise((resolve, reject) => {
+    const stream = cloudinary.uploader.upload_stream(
+      {
+        folder: "imagenes",
+        resource_type: "image",
+      },
+      (error, result) => {
+        if (result) resolve(result);
+        else reject(error);
+      }
+    );
+    streamifier.createReadStream(buffer).pipe(stream);
+  });
+}
 
 app.use(bodyParser.json({ limit: "10mb" })); // Permitir imágenes grandes en base64
 
@@ -588,7 +611,7 @@ app.put("/delete", async (req, res) => {
   }
 });
 
-app.post("/registrarTicket", async (req, res) => {
+app.post("/registrarTicket", upload.single("fotoTicket"), async (req, res) => {
   try {
     const {
       numeroNota,
@@ -597,7 +620,6 @@ app.post("/registrarTicket", async (req, res) => {
       total,
       fechaCompra,
       idCliente,
-      fotoTicket,
       idVendedor,
     } = req.body;
 
@@ -607,7 +629,8 @@ app.post("/registrarTicket", async (req, res) => {
       !idUnidad ||
       !cantidadPrendas ||
       !total ||
-      !fechaCompra 
+      !fechaCompra ||
+      !req.file
     ) {
       return res
         .status(400)
@@ -653,23 +676,15 @@ app.post("/registrarTicket", async (req, res) => {
         .json({ error: true, msg: "La nota ya fue registrada" });
     }
 
+    // Sube la imagen
     let imageUrl = "";
-
-    /*
-    // Subir imagen a Cloudinary
     try {
-      const uploadResponse = await cloudinary.uploader.upload(fotoTicket, {
-        folder: "imagenes",
-        resource_type: "image",
-      });
-      imageUrl = uploadResponse.secure_url;
-      
+      const result = await uploadToCloudinary(req.file.buffer);
+      imageUrl = result.secure_url;
     } catch (error) {
-      return res
-        .status(404)
-        .json({ error: true, msg: "Error al subir a Cloudinary:", error });
+      return res.status(500).json({ error: true, msg: "Error al subir imagen" });
     }
-        */
+
 
     let trivia = 0;
     let puntos = 0;
