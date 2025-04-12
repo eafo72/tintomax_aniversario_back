@@ -7,15 +7,13 @@ const auth = require("../middlewares/authorization");
 const db = require("../config/db");
 const mailer = require("../controller/mailController");
 
-const cloudinary = require('cloudinary').v2;
+const cloudinary = require("../config/cloudinaryConfig"); 
+const multer = require("multer");
 const streamifier = require('streamifier'); // para convertir buffer en stream
+const upload = multer({ storage });
+const storage = multer.memoryStorage(); // guardamos en memoria, útil para subir a Cloudinary
 
 const bodyParser = require("body-parser");
-
-const multer = require("multer");
-const storage = multer.memoryStorage(); // guardamos en memoria, útil para subir a Cloudinary
-const upload = multer({ storage });
-
 
 app.use(bodyParser.json({ limit: "10mb" })); // Permitir imágenes grandes en base64
 
