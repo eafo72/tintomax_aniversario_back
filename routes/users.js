@@ -607,8 +607,7 @@ app.post("/registrarTicket", async (req, res) => {
       !idUnidad ||
       !cantidadPrendas ||
       !total ||
-      !fechaCompra ||
-      !fotoTicket
+      !fechaCompra 
     ) {
       return res
         .status(400)
