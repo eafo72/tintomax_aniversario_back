@@ -19,6 +19,8 @@ app.get("/tickets/:id", async (req, res) => {
     s.nombreSucursal,
     c.id_compra,
     c.fecha_comp,
+    c.foto_comp,
+    c.nota_comp,
     ct.num_trivia,
     COALESCE(SUM(r.puntos_resp), 0) AS total_puntos
 FROM conjunto_triv ct
