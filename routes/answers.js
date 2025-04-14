@@ -56,7 +56,15 @@ app.get("/check/:idTrivia/:idUser/:idQuiz/:idAnswer/:numQuestion", async (req, r
     query = `SELECT * FROM conjunto_triv WHERE num_trivia = ? AND id_user_conj = ?`;
     answer = await db.pool.query(query, [id_trivia, id_usuario]);
     answer = answer[0][0];
-    const puntosporrespuestacorrecta = answer.cat_conj;
+
+    let puntosporrespuestacorrecta = 0;
+    
+    if(num_pregunta == 3){
+      puntosporrespuestacorrecta = 5;
+    }else{
+      puntosporrespuestacorrecta = answer.cat_conj;
+    }  
+    
 
     let totalPuntos = 0;
     if(respuesta_bool == 1){
