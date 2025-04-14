@@ -7,6 +7,7 @@ const userRoutes = require('./routes/users');
 const quizRoutes = require('./routes/quiz');
 const answerRoutes = require('./routes/answers');
 const storeRoutes = require('./routes/stores');
+const shopRoutes = require('./routes/shop');
 
 require('dotenv').config();
 
@@ -20,6 +21,7 @@ app.use('/usuario', userRoutes);
 app.use('/preguntas', quizRoutes);
 app.use('/respuestas', answerRoutes);
 app.use('/tiendas', storeRoutes);
+app.use('/compras', shopRoutes);
 
 app.get('/', (req, res) => res.send('TINTOMAX API'));
 
