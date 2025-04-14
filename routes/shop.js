@@ -18,19 +18,21 @@ app.get("/tickets/:id", async (req, res) => {
     ct.id_user_conj AS id_usuario,
     s.nombreSucursal,
     c.id_compra,
-    ct.id_conj,
     c.fecha_comp,
+    ct.num_trivia,
     COALESCE(SUM(r.puntos_resp), 0) AS total_puntos
 FROM conjunto_triv ct
 JOIN compras c ON ct.id_comp_conj = c.id_compra
 JOIN sucursales s ON c.id_unidad_comp = s.idSucursal
 LEFT JOIN respuestas r 
     ON ct.id_user_conj = r.id_usuario_resp 
-    AND ct.id_conj = r.id_conj_resp
+    AND ct.num_trivia = r.id_conj_resp
 WHERE ct.id_user_conj = ?
 AND (ct.estatus_conj = 'asignada' OR ct.estatus_conj = 'contestada')
-GROUP BY ct.id_conj, ct.id_user_conj, c.id_compra, s.nombreSucursal, c.fecha_comp
-ORDER BY c.fecha_comp;`;
+GROUP BY ct.num_trivia, ct.id_user_conj, c.id_compra, s.nombreSucursal, c.fecha_comp
+ORDER BY c.fecha_comp`;
+
+
 
     let tickets = await db.pool.query(query, [userId]);
     tickets = tickets[0];
