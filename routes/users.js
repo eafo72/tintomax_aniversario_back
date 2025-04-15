@@ -7,7 +7,7 @@ const auth = require("../middlewares/authorization");
 const db = require("../config/db");
 const mailer = require("../controller/mailController");
 
-const cloudinary = require("../config/cloudinaryConfig"); 
+const cloudinary = require("../config/cloudinaryConfig");
 const multer = require("multer");
 const streamifier = require('streamifier'); // para convertir buffer en stream
 
@@ -548,6 +548,191 @@ app.put("/set", async (req, res) => {
         id: result.insertId,
       },
     };
+
+    res
+      .status(200)
+      .json({ error: false, msg: "Registro actualizado con exito" });
+  } catch (error) {
+    res.status(400).json({ error: true, details: error });
+  }
+});
+
+app.put("/setName", async (req, res) => {
+  try {
+    let {
+      id,
+      nombre_usur
+    } = req.body;
+
+    let errors = Array();
+
+    if (!id) {
+      errors.push({ msg: "El campo id debe de contener un valor valido" });
+    }
+    if (!nombre_usur) {
+      errors.push({ msg: "El campo nombre debe de contener un valor" });
+    }
+
+    if (errors.length >= 1) {
+      return res.status(400).json({
+        msg: "Errores en los parametros",
+        error: true,
+        details: errors,
+      });
+    }
+
+    let today = new Date();
+    let date =
+      today.getFullYear() +
+      "-" +
+      (today.getMonth() + 1) +
+      "-" +
+      today.getDate();
+    let time =
+      today.getHours() + ":" + today.getMinutes() + ":" + today.getSeconds();
+    let fecha = date + " " + time;
+    let query = ``;
+
+    query = `UPDATE usuario  SET
+						nombre_usur = '${nombre_usur}', 
+						updated_at  = '${fecha}'
+	  				WHERE id_usuario = ${id}`;
+
+
+    let result = await db.pool.query(query);
+    result = result[0];
+
+    res
+      .status(200)
+      .json({ error: false, msg: "Registro actualizado con exito" });
+  } catch (error) {
+    res.status(400).json({ error: true, details: error });
+  }
+});
+
+app.put("/setPhone", async (req, res) => {
+  try {
+    let {
+      id,
+      tel_usur
+    } = req.body;
+
+    let errors = Array();
+
+    if (!id) {
+      errors.push({ msg: "El campo id debe de contener un valor valido" });
+    }
+    if (!tel_usur) {
+      errors.push({ msg: "El campo teléfono debe de contener un valor" });
+    }
+
+    if (errors.length >= 1) {
+      return res.status(400).json({
+        msg: "Errores en los parametros",
+        error: true,
+        details: errors,
+      });
+    }
+
+    let today = new Date();
+    let date =
+      today.getFullYear() +
+      "-" +
+      (today.getMonth() + 1) +
+      "-" +
+      today.getDate();
+    let time =
+      today.getHours() + ":" + today.getMinutes() + ":" + today.getSeconds();
+    let fecha = date + " " + time;
+    let query = ``;
+
+
+    query = `UPDATE usuario  SET
+						tel_usur    = '${tel_usur}', 
+	  				updated_at  = '${fecha}'
+	  				WHERE id_usuario = ${id}`;
+
+    let result = await db.pool.query(query);
+    result = result[0];
+
+    res
+      .status(200)
+      .json({ error: false, msg: "Registro actualizado con exito" });
+
+  } catch (error) {
+    res.status(400).json({ error: true, details: error });
+  }
+});
+
+app.put("/setPass", async (req, res) => {
+  try {
+    let {
+      id,
+      oldpass,
+      pass
+    } = req.body;
+
+    let errors = Array();
+
+    if (!id) {
+      errors.push({ msg: "El campo id debe de contener un valor valido" });
+    }
+    if (!oldpass) {
+      errors.push({ msg: "El campo oldpass debe de contener un valor" });
+    }
+    if (!pass) {
+      errors.push({ msg: "El campo oldpass debe de contener un valor" });
+    }
+
+
+    if (errors.length >= 1) {
+      return res.status(400).json({
+        msg: "Errores en los parametros",
+        error: true,
+        details: errors,
+      });
+    }
+
+    let query2 = `SELECT * FROM usuarios WHERE id_usuario = '${id}'`;
+    let user = await db.pool.query(query2);
+    user = user[0];
+
+    if (user.length === 0) {
+      return res.status(400).json({ error: true, msg: "El usuario no existe" });
+    }
+    user = user[0];
+
+    const passCorrecto = await bcryptjs.compare(oldpass, user.pass);
+
+    if (!passCorrecto) {
+      return res.status(400).json({ error: true, msg: "Password incorrecto" });
+    }
+
+    let today = new Date();
+    let date =
+      today.getFullYear() +
+      "-" +
+      (today.getMonth() + 1) +
+      "-" +
+      today.getDate();
+    let time =
+      today.getHours() + ":" + today.getMinutes() + ":" + today.getSeconds();
+    let fecha = date + " " + time;
+    let query = ``;
+
+
+    const salt = await bcryptjs.genSalt(10);
+    const hashedPassword = await bcryptjs.hash(pass, salt);
+
+    query = `UPDATE usuario  SET
+	    			 pass        = '${hashedPassword}', 
+             updated_at  = '${fecha}'
+             WHERE id_usuario = ${id}`;
+
+
+    let result = await db.pool.query(query);
+    result = result[0];
+
 
     res
       .status(200)
