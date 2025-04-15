@@ -200,7 +200,7 @@ app.post("/crear", async (req, res) => {
       },
     };
 
-    const token = jwt.sign(payload, process.env.SECRET, { expiresIn: "1d" });
+    const token = jwt.sign(payload, process.env.SECRET, { expiresIn: "60d" });
 
     //enviamos correo para que confirme su cuenta
     let message = {
