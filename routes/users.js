@@ -593,7 +593,7 @@ app.put("/setName", async (req, res) => {
     let fecha = date + " " + time;
     let query = ``;
 
-    query = `UPDATE usuario  SET
+    query = `UPDATE usuarios SET
 						nombre_usur = '${nombre_usur}', 
 						updated_at  = '${fecha}'
 	  				WHERE id_usuario = ${id}`;
@@ -647,7 +647,7 @@ app.put("/setPhone", async (req, res) => {
     let query = ``;
 
 
-    query = `UPDATE usuario  SET
+    query = `UPDATE usuarios  SET
 						tel_usur    = '${tel_usur}', 
 	  				updated_at  = '${fecha}'
 	  				WHERE id_usuario = ${id}`;
@@ -724,7 +724,7 @@ app.put("/setPass", async (req, res) => {
     const salt = await bcryptjs.genSalt(10);
     const hashedPassword = await bcryptjs.hash(pass, salt);
 
-    query = `UPDATE usuario  SET
+    query = `UPDATE usuarios  SET
 	    			 pass        = '${hashedPassword}', 
              updated_at  = '${fecha}'
              WHERE id_usuario = ${id}`;
