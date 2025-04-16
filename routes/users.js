@@ -413,7 +413,7 @@ app.post("/verificar", auth, async (req, res) => {
 
     // Consultamos la base de datos para obtener los datos del usuario (excluyendo la contraseña)
     const [rows] = await db.pool.query(
-      "SELECT id_usuario, nombre_usur, correo_usur, tel_usur, acumulado_usur, tipo_usur, estatus_usur, ranking_usur, id_sucursal FROM usuarios WHERE id_usuario = ?",
+      "SELECT id_usuario, nombre_usur, correo_usur, tel_usur, acumulado_usur, tipo_usur, estatus_usur, ranking_usur, id_sucursal FROM usuarios LEFT JOIN sucursales ON sucursales.idSucursal = usuarios.id_sucursal WHERE id_usuario = ?",
       [userId]
     );
 
@@ -716,7 +716,7 @@ app.put("/setPass", async (req, res) => {
     const passCorrecto = await bcryptjs.compare(oldpass, user.pass);
 
     if (!passCorrecto) {
-      return res.status(400).json({ error: true, msg: "Password incorrecto" });
+      return res.status(400).json({ error: true, msg: "Contraseña incorrecta" });
     }
 
     let today = new Date();
