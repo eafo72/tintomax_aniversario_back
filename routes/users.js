@@ -245,7 +245,7 @@ app.post("/login", async (req, res) => {
       });
     }
 
-    let query = `SELECT * FROM usuarios WHERE correo_usur = '${email}'`;
+    let query = `SELECT * FROM usuarios WHERE correo_usur = '${email}' AND estatus_usur != 'cancelado'`;
 
     let user = await db.pool.query(query);
 
@@ -303,6 +303,58 @@ app.post("/login", async (req, res) => {
   } catch (error) {
     console.log(error);
     res.json({ error: true, msg: "Hubo un error", error });
+  }
+});
+
+app.post("/desactivar", async (req, res) => {
+  try {
+    
+    const { userId } = req.body;
+
+    let errors = Array();
+
+    if (!userId) {
+      errors.push({ msg: "El campo id usuario debe de contener un valor" });
+    }
+
+    if (errors.length >= 1) {
+      return res.status(400).json({
+        msg: "Errores en los parametros",
+        error: true,
+        details: errors,
+      });
+    }
+
+    let today = new Date();
+    let date =
+      today.getFullYear() +
+      "-" +
+      (today.getMonth() + 1) +
+      "-" +
+      today.getDate();
+    let time =
+      today.getHours() + ":" + today.getMinutes() + ":" + today.getSeconds();
+    let fecha = date + " " + time;
+    let query = ``;
+
+    query = `UPDATE usuarios SET
+						estatus_usur = 'cancelado', 
+						updated_at  = '${fecha}'
+	  				WHERE id_usuario = ${userId}`;
+
+
+    let result = await db.pool.query(query);
+    result = result[0];
+
+    res
+      .status(200)
+      .json({ error: false, msg: "El usuario ha sido dado de baja" });
+    
+  } catch (error) {
+    res.status(500).json({
+      msg: "Hubo un error obteniendo los datos",
+      error: true,
+    });
   }
 });
 
