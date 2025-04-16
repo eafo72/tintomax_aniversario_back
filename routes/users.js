@@ -634,6 +634,17 @@ app.put("/setPhone", async (req, res) => {
       });
     }
 
+    //Verificamos no exista el telefono en la DB
+    let query2 = `SELECT * FROM usuarios WHERE tel_usur = '${tel_usur}' AND id_usuario != '${id}'`;
+    let existTelefono = await db.pool.query(query2);
+
+    if (existTelefono[0].length >= 1) {
+      return res.status(400).json({
+        msg: "El teléfono ya está registrado",
+        error: true,
+      });
+    }
+
     let today = new Date();
     let date =
       today.getFullYear() +
