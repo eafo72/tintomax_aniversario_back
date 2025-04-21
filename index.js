@@ -17,12 +17,13 @@ app.use(cors());
 app.use(express.json());
 
 const admin = require('firebase-admin');
+const { privateKey } = JSON.parse(process.env.FIREBASE_MESSAGING_PRIVATE_KEY);
 
 // Inicialización del Firebase Admin SDK
 admin.initializeApp({
     credential: admin.credential.cert({
         projectId: process.env.FIREBASE_PROJECT_ID,
-        privateKey: process.env.FIREBASE_MESSAGING_PRIVATE_KEY.replace(/\\n/g, '\n'),
+        privateKey: privateKey,
         clientEmail: process.env.FIREBASE_CLIENT_EMAIL
     }),
 });
