@@ -1038,28 +1038,31 @@ app.post("/registrarTicket", upload.single("fotoTicket"), async (req, res) => {
 
     //le avisamos al usuario
     if (firebase_token) {
-      const message = {
+
+      const payload = {
         notification: {
-          title: 'Nuevo ticket registrado',
-          body: '¡FELICIDADES! Tienes un nuevo ticket en el sistema.'
-        },
-        token: firebase_token
+          title: '🎫 Nuevo ticket registrado',
+          body: 'Tu ticket ha sido registrado con éxito',
+          icon: '/icono.png',
+          click_action: 'https://agencianuba.com/max55aniv_pruebas/card.html'
+        }
       };
 
-      //Enviar notificación push
-      try {
-        const response = await admin.messaging().send(message);
-        console.log('✅ Notificación enviada:', response);
-        return res.status(201).json({
-          error: false,
-          msg: "Ticket registrado exitosamente",
-          nextTrivia: trivia_nueva,
-          ticketId: result.insertId,
+      admin.messaging().sendToDevice(firebase_token, payload)
+        .then(response => {
+          console.log('Notificación enviada:', response);
+          res.status(201).json({
+            error: false,
+            msg: "Ticket registrado exitosamente",
+            nextTrivia: trivia_nueva,
+            ticketId: result.insertId,
+          });
+
+        })
+        .catch(err => {
+          console.error('Error al enviar la notificación:', err);
+          res.status(500).send('Error al enviar la notificación');
         });
-      } catch (error) {
-        console.error('❌ Error al enviar la notificación:', error);
-        return res.status(500).send('Error al enviar la notificación');
-      }
 
     } else {
       console.error("El usuario no tiene token de firebase:", error);
