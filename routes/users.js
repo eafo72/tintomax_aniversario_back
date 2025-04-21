@@ -916,14 +916,14 @@ app.post("/registrarTicket", upload.single("fotoTicket"), async (req, res) => {
     selectQuery = `SELECT id_usuario, firebase_token FROM usuarios WHERE id_usuario = ? AND id_sucursal = ?`;
     [rows] = await db.pool.query(selectQuery, [idCliente, idUnidad]);
 
-    const firebase_token = rows[0].firebase_token;
-    console.log("FB token" + firebase_token);
-
     if (rows.length === 0) {
       return res
         .status(404)
         .json({ error: true, msg: "La sucursal seleccionada no le corresponde al Cliente" });
     }
+
+    const firebase_token = rows[0].firebase_token;
+    console.log("FB token" + firebase_token);
 
     // Subir imagen a Cloudinary desde buffer
     const uploadFromBuffer = () => {
