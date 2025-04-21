@@ -16,6 +16,8 @@ const db = require('./config/db');
 app.use(cors());
 app.use(express.json());
 
+const admin = require('firebase-admin');
+
 // Inicialización del Firebase Admin SDK
 admin.initializeApp({
     credential: admin.credential.cert({
