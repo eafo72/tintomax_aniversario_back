@@ -1040,7 +1040,7 @@ app.post("/registrarTicket", upload.single("fotoTicket"), async (req, res) => {
     if (firebase_token) {
 
       const message = {
-        token: firebaseToken,
+        token: firebase_token,
         webpush: {
           fcmOptions: {
             link: 'https://agencianuba.com/max55aniv_pruebas/card.html'
