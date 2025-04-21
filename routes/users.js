@@ -18,6 +18,9 @@ const bodyParser = require("body-parser");
 
 app.use(bodyParser.json({ limit: "10mb" })); // Permitir imágenes grandes en base64
 
+const admin = require('firebase-admin');
+
+
 app.get("/usuarios", async (req, res) => {
   try {
     let query = `SELECT 
@@ -308,7 +311,7 @@ app.post("/login", async (req, res) => {
 
 app.post("/desactivar", async (req, res) => {
   try {
-    
+
     const { userId } = req.body;
 
     let errors = Array();
@@ -349,7 +352,7 @@ app.post("/desactivar", async (req, res) => {
     res
       .status(200)
       .json({ error: false, msg: "El usuario ha sido dado de baja" });
-    
+
   } catch (error) {
     res.status(500).json({
       msg: "Hubo un error obteniendo los datos",
@@ -909,9 +912,12 @@ app.post("/registrarTicket", upload.single("fotoTicket"), async (req, res) => {
     }
 
 
-    //vemos si existe el id de sucursal corresponde al cliente
-    selectQuery = `SELECT id_usuario FROM usuarios WHERE id_usuario = ? AND id_sucursal = ?`;
+    //vemos si existe el id de sucursal corresponde al cliente si existe traemos el token de firebase
+    selectQuery = `SELECT id_usuario, firebase_token FROM usuarios WHERE id_usuario = ? AND id_sucursal = ?`;
     [rows] = await db.pool.query(selectQuery, [idCliente, idUnidad]);
+
+    const firebase_token = rows[0][0].firebase_token;
+    console.log("FB token" + firebase_token);
 
     if (rows.length === 0) {
       return res
@@ -1027,6 +1033,29 @@ app.post("/registrarTicket", upload.single("fotoTicket"), async (req, res) => {
       ];
 
       let result2 = await db.pool.query(query2, values2);
+    }
+
+
+    //le avisamos al usuario
+    if (firebase_token) {
+      const message = {
+        notification: {
+          title: 'Nuevo ticket registrado',
+          body: '¡FELICIDADES! Tienes un nuevo ticket en el sistema.'
+        },
+        token: firebase_token
+      };
+
+      //Enviar notificación push
+      admin.messaging().send(message)
+        .then((response) => {
+          res.status(200).send('Notificación enviada');
+        })
+        .catch((error) => {
+          console.error('Error al enviar la notificación:', error);
+          res.status(500).send('Error al enviar la notificación');
+        });
+
     }
 
     res.status(201).json({
