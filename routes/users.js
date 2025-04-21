@@ -1047,23 +1047,28 @@ app.post("/registrarTicket", upload.single("fotoTicket"), async (req, res) => {
       };
 
       //Enviar notificación push
-      admin.messaging().send(message)
-        .then((response) => {
-          res.status(200).send('Notificación enviada');
-        })
-        .catch((error) => {
-          console.error('Error al enviar la notificación:', error);
-          res.status(500).send('Error al enviar la notificación');
+      try {
+        const response = await admin.messaging().send(message);
+        console.log('✅ Notificación enviada:', response);
+        return res.status(201).json({
+          error: false,
+          msg: "Ticket registrado exitosamente",
+          nextTrivia: trivia_nueva,
+          ticketId: result.insertId,
         });
+      } catch (error) {
+        console.error('❌ Error al enviar la notificación:', error);
+        return res.status(500).send('Error al enviar la notificación');
+      }
+
+    } else {
+      console.error("El usuario no tiene token de firebase:", error);
+      res
+        .status(500)
+        .json({ error: true, msg: "El usuario no tiene token de firebase" });
 
     }
 
-    res.status(201).json({
-      error: false,
-      msg: "Ticket registrado exitosamente",
-      nextTrivia: trivia_nueva,
-      ticketId: result.insertId,
-    });
   } catch (error) {
     console.error("Error inesperado:", error);
     res
