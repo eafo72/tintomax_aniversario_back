@@ -1281,4 +1281,58 @@ app.get("/rankPositionStore/:id/:idSucursal", async (req, res) => {
   }
 });
 
+app.post('/save-token', async (req, res) => {
+  try {
+    const token = req.body.token;  // Recibe el token del cliente
+    const userId = req.body.userId; // ID del usuario (si lo necesitas)
+
+    let errors = Array();
+
+    if (!token) {
+      errors.push({ msg: "No se recibió el token" });
+    }
+    if (!userId) {
+      errors.push({ msg: "El campo userId debe de contener un valor" });
+    }
+
+    if (errors.length >= 1) {
+      return res.status(400).json({
+        msg: "Errores en los parametros",
+        error: true,
+        details: errors,
+      });
+    }
+
+    let today = new Date();
+    let date =
+      today.getFullYear() +
+      "-" +
+      (today.getMonth() + 1) +
+      "-" +
+      today.getDate();
+    let time =
+      today.getHours() + ":" + today.getMinutes() + ":" + today.getSeconds();
+    let fecha = date + " " + time;
+    let query = ``;
+
+    query = `UPDATE usuarios SET
+						firebase_token = '${token}', 
+						updated_at  = '${fecha}'
+	  				WHERE id_usuario = ${userId}`;
+
+
+    let result = await db.pool.query(query);
+    result = result[0];
+
+    res
+      .status(200)
+      .json({ error: false, msg: "Token guardado correctamente" });
+
+  } catch (error) {
+    res.status(400).json({ error: true, details: error });
+  }
+
+});
+
+
 module.exports = app;

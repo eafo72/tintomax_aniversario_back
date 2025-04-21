@@ -16,6 +16,15 @@ const db = require('./config/db');
 app.use(cors());
 app.use(express.json());
 
+// Inicialización del Firebase Admin SDK
+admin.initializeApp({
+    credential: admin.credential.cert({
+        projectId: process.env.FIREBASE_PROJECT_ID,
+        privateKey: process.env.FIREBASE_MESSAGING_PRIVATE_KEY,
+        clientEmail: process.env.FIREBASE_CLIENT_EMAIL
+    }),
+});
+
 //rutas
 app.use('/usuario', userRoutes);
 app.use('/preguntas', quizRoutes);
