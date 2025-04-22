@@ -1047,7 +1047,7 @@ app.post("/registrarTicket", upload.single("fotoTicket"), async (req, res) => {
           },
           notification: {
             title: '🎫 Nuevo ticket registrado',
-            body: 'Tu ticket ha sido registrado con éxito',
+            body: 'Tienes una nueva trivia liberada.',
             icon: '/icono.png'
           }
         }
