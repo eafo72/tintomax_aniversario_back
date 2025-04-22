@@ -1121,7 +1121,7 @@ app.get("/trivias/:id", async (req, res) => {
     AND ct.num_trivia = r.id_conj_resp
     WHERE ct.id_user_conj = ? 
     AND (ct.estatus_conj = 'asignada' OR ct.estatus_conj = 'contestada')
-    GROUP BY ct.num_trivia, ct.id_user_conj`;
+    GROUP BY ct.num_trivia, ct.id_user_conj ORDER BY ct.num_trivia DESC`;
 
     let trivias = await db.pool.query(query, [userId]);
     trivias = trivias[0];
