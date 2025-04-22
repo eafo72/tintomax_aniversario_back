@@ -913,7 +913,7 @@ app.post("/registrarTicket", upload.single("fotoTicket"), async (req, res) => {
 
 
     //vemos si existe el id de sucursal corresponde al cliente si existe traemos el token de firebase
-    selectQuery = `SELECT id_usuario, firebase_token FROM usuarios WHERE id_usuario = ? AND id_sucursal = ?`;
+    selectQuery = `SELECT id_usuario, firebase_token, correo_usur FROM usuarios WHERE id_usuario = ? AND id_sucursal = ?`;
     [rows] = await db.pool.query(selectQuery, [idCliente, idUnidad]);
 
     if (rows.length === 0) {
@@ -924,6 +924,7 @@ app.post("/registrarTicket", upload.single("fotoTicket"), async (req, res) => {
 
     const firebase_token = rows[0].firebase_token;
     console.log("FB token" + firebase_token);
+    const correoUsur = rows[0].correo_usur;
 
     // Subir imagen a Cloudinary desde buffer
     const uploadFromBuffer = () => {
@@ -1035,6 +1036,17 @@ app.post("/registrarTicket", upload.single("fotoTicket"), async (req, res) => {
       let result2 = await db.pool.query(query2, values2);
     }
 
+    //enviamos correo de notificacion
+    let message = {
+      from: process.env.MAIL, 
+      to: correoUsur,
+      subject: "Nuevo ticket registrado", 
+      text: "", 
+      html: `<p>Hemos registrado tu ticket, tienes una nueva trivia liberada.</p>`,
+    };
+
+    const info = await mailer.sendMail(message);
+    console.log(info);
 
     //le avisamos al usuario
     if (firebase_token) {
