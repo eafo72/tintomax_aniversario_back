@@ -266,6 +266,10 @@ app.post("/login", async (req, res) => {
       return res.status(400).json({ error: true, msg: "Password incorrecto" });
     }
 
+    if (user.tipo_usur == "Administrador") {
+      return res.status(400).json({ error: true, msg: "Lo sentimos, necesitas ser cliente o colaborador para tener acceso." });
+    } 
+
     const payload = {
       user: {
         id: user.id_usuario,
@@ -301,7 +305,79 @@ app.post("/login", async (req, res) => {
         }
       );
     } else {
-      res.json({ error: true, msg: "Hubo un error", error });
+      res.json({ error: true, msg: "Hubo un error"});
+    }
+  } catch (error) {
+    console.log(error);
+    res.json({ error: true, msg: "Hubo un error", error });
+  }
+});
+
+app.post("/loginAdmin", async (req, res) => {
+  try {
+    const { email, password } = req.body;
+
+    let errors = Array();
+
+    if (!email) {
+      errors.push({ msg: "El campo email debe de contener un valor" });
+    }
+    if (!password) {
+      errors.push({ msg: "El campo password debe de contener un valor" });
+    }
+
+    if (errors.length >= 1) {
+      return res.status(400).json({
+        msg: "Errores en los parametros",
+        error: true,
+        details: errors,
+      });
+    }
+
+    let query = `SELECT * FROM usuarios WHERE correo_usur = '${email}' AND estatus_usur != 'cancelado'`;
+
+    let user = await db.pool.query(query);
+
+    user = user[0];
+
+    if (user.length === 0) {
+      return res.status(400).json({ error: true, msg: "El usuario no existe" });
+    }
+
+    user = user[0];
+
+    const passCorrecto = await bcryptjs.compare(password, user.pass);
+
+    if (!passCorrecto) {
+      return res.status(400).json({ error: true, msg: "Password incorrecto" });
+    }
+
+    if (user.tipo_usur == "Cliente" || user.tipo_usur == "Colaborador") {
+      return res.status(400).json({ error: true, msg: "Lo sentimos no eres administrador" });
+    } 
+
+    const payload = {
+      user: {
+        id: user.id_usuario,
+        nombre: user.nombre_usur,
+        correo: user.correo_usur,
+        estatus: user.estatus_usur,
+      },
+    };
+
+    //firma del jwt  3600000 = 1hora
+    if (email && passCorrecto) {
+      jwt.sign(
+        payload,
+        process.env.SECRET,
+        { expiresIn: 3600000 },
+        (error, token) => {
+          if (error) throw error;
+          res.status(200).json({ error: false, token: token });
+        }
+      );
+    } else {
+      res.json({ error: true, msg: "Hubo un error"});
     }
   } catch (error) {
     console.log(error);
