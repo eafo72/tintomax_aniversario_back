@@ -808,6 +808,59 @@ app.put("/setPass", async (req, res) => {
   }
 });
 
+app.put("/setCity", async (req, res) => {
+  try {
+    let {
+      id,
+      ciudad_usur
+    } = req.body;
+
+    let errors = Array();
+
+    if (!id) {
+      errors.push({ msg: "El campo id debe de contener un valor valido" });
+    }
+    if (!ciudad_usur) {
+      errors.push({ msg: "El campo ciudad debe de contener un valor" });
+    }
+
+    if (errors.length >= 1) {
+      return res.status(400).json({
+        msg: "Errores en los parametros",
+        error: true,
+        details: errors,
+      });
+    }
+
+    let today = new Date();
+    let date =
+      today.getFullYear() +
+      "-" +
+      (today.getMonth() + 1) +
+      "-" +
+      today.getDate();
+    let time =
+      today.getHours() + ":" + today.getMinutes() + ":" + today.getSeconds();
+    let fecha = date + " " + time;
+    let query = ``;
+
+    query = `UPDATE usuarios  SET
+						ciudad_usur    = '${ciudad_usur}', 
+	  				updated_at  = '${fecha}'
+	  				WHERE id_usuario = ${id}`;
+
+    let result = await db.pool.query(query);
+    result = result[0];
+
+    res
+      .status(200)
+      .json({ error: false, msg: "Registro actualizado con exito" });
+
+  } catch (error) {
+    res.status(400).json({ error: true, details: error });
+  }
+});
+
 app.put("/delete", async (req, res) => {
   try {
     let userId = req.body.id;
