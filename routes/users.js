@@ -1072,11 +1072,12 @@ app.post("/registrarTicket", upload.single("fotoTicket"), async (req, res) => {
 
 
     } else {
-      console.error("El usuario no tiene token de firebase:", error);
-      res
-        .status(500)
-        .json({ error: true, msg: "El usuario no tiene token de firebase" });
-
+      res.status(201).json({
+        error: false,
+        msg: "Ticket registrado exitosamente, pero no se enviaron notificaciones",
+        nextTrivia: trivia_nueva,
+        ticketId: result.insertId,
+      });
     }
 
   } catch (error) {
