@@ -3,6 +3,22 @@ const express = require("express");
 const app = express.Router();
 const db = require("../config/db");
 
+app.get("/generales", async (req, res) => {
+  try {
+    let query = `SELECT * FROM compras`;
+    let compras = await db.pool.query(query);
+    compras = compras[0];
+
+    res.status(200).json({ error: false, compras });
+  } catch (error) {
+    res.status(500).json({
+      msg: "Hubo un error obteniendo los datos",
+      error: true,
+      details: error,
+    });
+  }
+});
+
 app.get("/tickets/:id", async (req, res) => {
   let userId = req.params.id;
 
