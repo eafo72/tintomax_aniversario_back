@@ -5,7 +5,7 @@ const db = require("../config/db");
 
 app.get("/generales", async (req, res) => {
   try {
-    let query = `SELECT * FROM compras`;
+    let query = `SELECT * FROM compras c INNER JOIN usuarios u ON c.id_usuario_comp = u.id_usuario INNER JOIN sucursales s ON c.id_unidad_comp = s.idSucursal ORDER BY fecha_reg_comp DESC`;
     let compras = await db.pool.query(query);
     compras = compras[0];
 
