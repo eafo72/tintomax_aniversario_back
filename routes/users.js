@@ -211,7 +211,7 @@ app.post("/crear", async (req, res) => {
       to: correo_usur, // list of receivers
       subject: "Confirma tu cuenta", // Subject line
       text: "", // plain text body
-      html: `<p>Haz click en el enlace para confirmar tu cuenta</p><a href="http://agencianuba.com/max55aniv_pruebas/verified.html?token=${token}">Confirma tu cuenta</a>`,
+      html: `<p>Haz click en el enlace para confirmar tu cuenta</p><a href="http://maxaniversario.com/verified.html?token=${token}">Confirma tu cuenta</a>`,
     };
     const info = await mailer.sendMail(message);
     console.log(info);
@@ -1184,7 +1184,7 @@ app.post("/registrarTicket", upload.single("fotoTicket"), async (req, res) => {
         token: firebase_token,
         webpush: {
           fcmOptions: {
-            link: 'https://agencianuba.com/max55aniv_pruebas/card.html'
+            link: 'https://maxaniversario.com/card.html'
           },
           notification: {
             title: '🎫 Nuevo ticket registrado',
