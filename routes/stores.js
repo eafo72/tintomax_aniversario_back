@@ -22,4 +22,33 @@ app.get("/sucursales", async (req, res) => {
   }
 });
 
+app.get("/obtener/:id", async (req, res) => {
+  try {
+    let storeId = req.params.id;
+
+    if (!storeId) {
+      return res.status(400).json({
+        msg: "El id debe de tener algun valor",
+        error: true,
+      });
+    }
+
+    let query = `SELECT * FROM sucursales WHERE idSucursal = ${storeId}`;
+
+    let store = await db.pool.query(query);
+
+    store = store[0];
+
+    res.status(200).json({ error: false, store });
+
+  } catch (error) {
+    res.status(500).json({
+      msg: "Hubo un error obteniendo los datos",
+      error: true,
+      details: error,
+    });
+  }
+});
+
+
 module.exports = app;
