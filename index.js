@@ -19,7 +19,7 @@ app.use(express.json());
 const admin = require('firebase-admin');
 const decoded = Buffer.from(process.env.FIREBASE_MESSAGING_PRIVATE_KEY, 'base64').toString('utf-8');
 
-const { privateKey } = JSON.parse(decoded);
+const { privateKey } = decoded;
 
 // Inicialización del Firebase Admin SDK
 admin.initializeApp({
