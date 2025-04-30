@@ -17,7 +17,7 @@ app.use(cors());
 app.use(express.json());
 
 const admin = require('firebase-admin');
-const decoded = Buffer.from(process.env.FIREBASE_MESSAGING_KEY_BASE64, 'base64').toString('utf-8');
+const decoded = Buffer.from(process.env.FIREBASE_MESSAGING_PRIVATE_KEY, 'base64').toString('utf-8');
 
 const { privateKey } = JSON.parse(decoded);
 
