@@ -13,11 +13,19 @@ require('dotenv').config();
 
 const db = require('./config/db');
 
-app.use(cors({
-    origin: '*',
-    methods: ['GET','HEAD','PUT','PATCH','POST','DELETE','OPTIONS'],
-    allowedHeaders: ['Content-Type','Authorization']  
-}));
+app.use((req, res, next) => {
+    res.header('Access-Control-Allow-Origin', 'https://maxaniversario.com');
+    res.header(
+      'Access-Control-Allow-Headers',
+      'Origin, X-Requested-With, Content-Type, Accept, Authorization'
+    );
+    res.header('Access-Control-Allow-Methods', 'GET,POST,PUT,PATCH,DELETE,OPTIONS');
+    if (req.method === 'OPTIONS') {
+      // Preflight
+      return res.sendStatus(204);
+    }
+    next();
+});
 
 app.use(express.json());
 
