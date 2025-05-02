@@ -13,7 +13,12 @@ require('dotenv').config();
 
 const db = require('./config/db');
 
-app.use(cors());
+app.use(cors({
+    origin: '*',
+    methods: ['GET','HEAD','PUT','PATCH','POST','DELETE','OPTIONS'],
+    allowedHeaders: ['Content-Type','Authorization']  
+}));
+
 app.use(express.json());
 
 const admin = require('firebase-admin');
