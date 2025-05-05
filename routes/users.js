@@ -1145,34 +1145,49 @@ app.post("/registrarTicket", upload.single("fotoTicket"), async (req, res) => {
 
       trivia_nueva = Number(ultima_trivia) + 1;
 
-      //UPDATE
-      const query2 = `UPDATE conjunto_triv SET 
+      if(trivia_nueva <= 50){
+
+        //UPDATE
+        const query2 = `UPDATE conjunto_triv SET 
                     id_comp_conj = ?, 
                     id_unid_conj = ?, 
                     cat_conj = ?, 
                     estatus_conj = ?
                 WHERE num_trivia = ? AND id_user_conj = ?`;
 
-      const values2 = [
-        result.insertId,
-        idUnidad,
-        puntos,
-        "asignada",
-        trivia_nueva,
-        idCliente
-      ];
+        const values2 = [
+          result.insertId,
+          idUnidad,
+          puntos,
+          "asignada",
+          trivia_nueva,
+          idCliente
+        ];
 
-      let result2 = await db.pool.query(query2, values2);
+        let result2 = await db.pool.query(query2, values2);
+      }  
+
     }
 
     //enviamos correo de notificacion
-    let message = {
+    let message = {};
+    if(trivia_nueva <= 50){
+      message = {
       from: process.env.MAIL, 
       to: correoUsur,
       subject: "Nuevo ticket registrado", 
       text: "", 
       html: `<p>Hemos registrado tu ticket, tienes una nueva trivia liberada.</p>`,
-    };
+      };
+    }else{
+      message = {
+        from: process.env.MAIL, 
+        to: correoUsur,
+        subject: "Nuevo ticket registrado", 
+        text: "", 
+        html: `<p>Hemos registrado tu ticket, has alcanzado el número máximo de trivias.</p>`,
+        };
+    }  
 
     const info = await mailer.sendMail(message);
     console.log(info);
@@ -1180,7 +1195,10 @@ app.post("/registrarTicket", upload.single("fotoTicket"), async (req, res) => {
     //le avisamos al usuario
     if (firebase_token) {
 
-      const message = {
+      let message = {};
+      if(trivia_nueva <= 50){
+
+        message = {
         token: firebase_token,
         webpush: {
           fcmOptions: {
@@ -1192,18 +1210,44 @@ app.post("/registrarTicket", upload.single("fotoTicket"), async (req, res) => {
             icon: '/icono.png'
           }
         }
-      };
+        };
+      }else{
+        message = {
+          token: firebase_token,
+          webpush: {
+            fcmOptions: {
+              link: 'https://maxaniversario.com/card.html'
+            },
+            notification: {
+              title: '🎫 Nuevo ticket registrado',
+              body: 'Has alcanzado el número máximo de trivias',
+              icon: '/icono.png'
+            }
+          }
+          };
+      }  
 
 
       admin.messaging().send(message)
         .then((messageId) => {
           console.log('Notificación enviada, messageId =', messageId);
-          res.status(201).json({
+
+          if(trivia_nueva <= 50){
+            res.status(201).json({
             error: false,
-            msg: "Ticket registrado exitosamente",
+            msg: "Hemos registrado tu ticket, tienes una nueva trivia liberada",
             nextTrivia: trivia_nueva,
             ticketId: result.insertId,
-          });
+            });
+          }else{
+            res.status(201).json({
+              error: false,
+              msg: "Hemos registrado tu ticket, has alcanzado el número máximo de trivias.",
+              nextTrivia: trivia_nueva,
+              ticketId: result.insertId,
+              });
+          }  
+
         })
         .catch((err) => {
           console.error('Error al enviar la notificación:', err);
@@ -1213,13 +1257,24 @@ app.post("/registrarTicket", upload.single("fotoTicket"), async (req, res) => {
 
 
     } else {
-      res.status(201).json({
+      if(trivia_nueva <= 50){
+        res.status(201).json({
         error: false,
-        msg: "Ticket registrado exitosamente, pero no se enviaron notificaciones",
+        msg: "Hemos registrado tu ticket, tienes una nueva trivia liberada, pero no se enviaron notificaciones",
         nextTrivia: trivia_nueva,
         ticketId: result.insertId,
-      });
+        });
+      } else {
+        res.status(201).json({
+          error: false,
+          msg: "Hemos registrado tu ticket, has alcanzado el número máximo de trivias, pero no se enviaron notificaciones",
+          nextTrivia: trivia_nueva,
+          ticketId: result.insertId,
+          });
+
+      }  
     }
+    
 
   } catch (error) {
     console.error("Error inesperado:", error);
