@@ -8,23 +8,24 @@ const quizRoutes = require('./routes/quiz');
 const answerRoutes = require('./routes/answers');
 const storeRoutes = require('./routes/stores');
 const shopRoutes = require('./routes/shop');
+const rankingRoutes = require('./routes/ranking');
 
 require('dotenv').config();
 
 const db = require('./config/db');
 
 app.use((req, res, next) => {
-    res.header('Access-Control-Allow-Origin', 'https://maxaniversario.com');
-    res.header(
-      'Access-Control-Allow-Headers',
-      'Origin, X-Requested-With, Content-Type, Accept, Authorization'
-    );
-    res.header('Access-Control-Allow-Methods', 'GET,POST,PUT,PATCH,DELETE,OPTIONS');
-    if (req.method === 'OPTIONS') {
-      // Preflight
-      return res.sendStatus(204);
-    }
-    next();
+  res.header('Access-Control-Allow-Origin', 'https://maxaniversario.com');
+  res.header(
+    'Access-Control-Allow-Headers',
+    'Origin, X-Requested-With, Content-Type, Accept, Authorization'
+  );
+  res.header('Access-Control-Allow-Methods', 'GET,POST,PUT,PATCH,DELETE,OPTIONS');
+  if (req.method === 'OPTIONS') {
+    // Preflight
+    return res.sendStatus(204);
+  }
+  next();
 });
 
 app.use(express.json({ limit: '25mb' }));
@@ -34,9 +35,9 @@ const admin = require('firebase-admin');
 
 // Inicialización del Firebase Admin SDK
 admin.initializeApp({
-    credential: admin.credential.cert({
-        projectId: process.env.FIREBASE_PROJECT_ID,
-        privateKey: `-----BEGIN PRIVATE KEY-----
+  credential: admin.credential.cert({
+    projectId: process.env.FIREBASE_PROJECT_ID,
+    privateKey: `-----BEGIN PRIVATE KEY-----
 MIIEvgIBADANBgkqhkiG9w0BAQEFAASCBKgwggSkAgEAAoIBAQCX1ZEARUCzZxbL
 aL4l3MJ6uX9C2+w14D8bIQtUe6gEss6UH00U4FDOZtbQ3rYfUE9T/qa0yrkFk3Av
 UfOjxUuolylrJ+uFFf1Zg7CkuPhi71kN+kb9v7uiuRQS90fF8Dzlk2aes0fHAnHT
@@ -64,9 +65,53 @@ Mj4dabG6tMNMJ8h7gfhXvKzZopQsyX/d6g2mPqaXAoGBAIGVrsDwkN4S4b30/ZXr
 tVTw8zbBRIh+NbOG4xoK2MgMsSF1LGm1QSK3E2lv7anOlM/+kdnOVmZ0X4myg8FH
 QQ3RyudOh/2uCQtNiHcQeGQB
 -----END PRIVATE KEY-----`,
-        clientEmail: process.env.FIREBASE_CLIENT_EMAIL
-    }),
+    clientEmail: process.env.FIREBASE_CLIENT_EMAIL
+  }),
 });
+
+
+
+async function cronRanking() {
+  try {
+    let today = new Date();
+    let date = today.getFullYear() + '-' + (today.getMonth() + 1) + '-' + today.getDate();
+    let time = today.getHours() + ':' + today.getMinutes() + ':' + today.getSeconds();
+    let fecha = date + ' ' + time;
+
+    //Actualizar el ranking
+    const updateRankingQuery = `
+      UPDATE usuarios 
+      JOIN (SELECT id_usuario, 
+         RANK() OVER (ORDER BY acumulado_usur DESC) AS nueva_posicion
+         FROM usuarios) AS ranking 
+         ON usuarios.id_usuario = ranking.id_usuario
+      SET usuarios.ranking_usur = ranking.nueva_posicion;
+    `;
+    await db.pool.query(updateRankingQuery);
+
+    const updateRankingTableQuery = `UPDATE ranking SET lastUpdated = ${fecha} WHERE idRanking = 1`;
+    await db.pool.query(updateRankingTableQuery);
+
+
+    console.log("Cron job realizado");
+
+
+  } catch (error) {
+    console.log(error);
+    console.log("Cron job NO realizado");
+  }
+}
+
+//CRON para marcar actualizar ranking
+//At 01:00 on every day-of-week from Sunday through Saturday. www.crontab.guru
+cron.schedule("0 1 * * 0-6", function () {
+  console.log("---------------------");
+  console.log("running a cron job every day");
+
+  cronRanking();
+
+});
+
 
 //rutas
 app.use('/usuario', userRoutes);
@@ -74,6 +119,7 @@ app.use('/preguntas', quizRoutes);
 app.use('/respuestas', answerRoutes);
 app.use('/tiendas', storeRoutes);
 app.use('/compras', shopRoutes);
+app.use('/ranking', rankingRoutes);
 
 app.get('/', (req, res) => res.send('TINTOMAX API'));
 
