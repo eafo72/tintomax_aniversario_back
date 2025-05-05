@@ -287,7 +287,7 @@ app.post("/login", async (req, res) => {
     } else if (user.tipo_usur == "Colaborador") {
 
       //vemos si en base a las fechas de vigencia del concurso el usuario se puede loguear
-      const [rows] = await db.query("SELECT fecha_inicio, fecha_fin FROM vigencia LIMIT 1");
+      const [rows] = await db.pool.query("SELECT fecha_inicio, fecha_fin FROM vigencia LIMIT 1");
 
       if (rows.length === 0) {
         return res.status(400).json({ error: true, msg: "No se encontró información de vigencia en la base de datos" });
