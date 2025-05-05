@@ -1177,7 +1177,7 @@ app.post("/registrarTicket", upload.single("fotoTicket"), async (req, res) => {
       to: correoUsur,
       subject: "Nuevo ticket registrado", 
       text: "", 
-      html: `<p>Hemos registrado tu ticket, tienes una nueva trivia liberada.</p>`,
+      html: `<p>Hemos registrado tu ticket ${numeroNota}, tienes una nueva trivia liberada.</p>`,
       };
     }else{
       message = {
@@ -1185,7 +1185,7 @@ app.post("/registrarTicket", upload.single("fotoTicket"), async (req, res) => {
         to: correoUsur,
         subject: "Nuevo ticket registrado", 
         text: "", 
-        html: `<p>Hemos registrado tu ticket, has alcanzado el número máximo de trivias.</p>`,
+        html: `<p>Hemos registrado tu ticket ${numeroNota}, has alcanzado el número máximo de trivias.</p>`,
         };
     }  
 
