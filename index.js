@@ -14,8 +14,16 @@ require('dotenv').config();
 
 const db = require('./config/db');
 
+const allowedOrigins = [
+  'https://maxaniversario.com',
+  'https://max-panel.web.app'
+];
+
 app.use((req, res, next) => {
-  res.header('Access-Control-Allow-Origin', 'https://maxaniversario.com');
+  const origin = req.headers.origin;
+  if (allowedOrigins.includes(origin)) {
+    res.header('Access-Control-Allow-Origin', origin);
+  }
   res.header(
     'Access-Control-Allow-Headers',
     'Origin, X-Requested-With, Content-Type, Accept, Authorization'
