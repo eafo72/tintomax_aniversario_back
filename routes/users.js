@@ -577,8 +577,36 @@ app.post("/verificar", auth, async (req, res) => {
         .json({ error: true, msg: "Usuario no encontrado" });
     }
 
+    const user = rows[0];
+
+    if (user.tipo_usur == "Colaborador") {
+
+      //vemos si en base a las fechas de vigencia del concurso el usuario se puede loguear
+      const [rows] = await db.pool.query("SELECT fecha_inicio, fecha_fin FROM vigencia LIMIT 1");
+
+      if (rows.length === 0) {
+        return res.status(400).json({ error: true, msg: "No se encontró información de vigencia en la base de datos" });
+      } else {
+
+        //vemos si entra en los parametros del concurso
+        const { fecha_inicio, fecha_fin } = rows[0];
+        const fechaActual = new Date();
+        const soloFecha = (fecha) => new Date(fecha.getFullYear(), fecha.getMonth(), fecha.getDate());
+
+        const inicio = soloFecha(new Date(fecha_inicio));
+        const fin = soloFecha(new Date(fecha_fin));
+        const actual = soloFecha(fechaActual);
+
+        if (actual < inicio || actual > fin) {
+          return res.status(400).json({ error: true, msg: "La fecha actual no está dentro del periodo permitido" });
+        }
+      }
+    
+    }
+
     // Devolvemos los datos del usuario
-    res.status(200).json({ error: false, user: rows[0] });
+    res.status(200).json({ error: false, user: user });
+
   } catch (error) {
     res.status(500).json({
       msg: "Hubo un error obteniendo los datos",
