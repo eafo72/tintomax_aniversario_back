@@ -326,6 +326,16 @@ app.post("/loginAdmin", async (req, res) => {
       errors.push({ msg: "El campo password debe de contener un valor" });
     }
 
+    const fechaActual = new Date();
+    const inicio = new Date("2025-05-31");
+    const fin = new Date("2025-07-11");
+
+    const soloFecha = (fecha) => new Date(fecha.getFullYear(), fecha.getMonth(), fecha.getDate());
+
+    if (soloFecha(fechaActual) < soloFecha(inicio) || soloFecha(fechaActual) > soloFecha(fin)) {
+      errors.push({ msg: "La fecha actual no está dentro del periodo permitido (31 de mayo al 11 de julio de 2025)" });
+    }
+
     if (errors.length >= 1) {
       return res.status(400).json({
         msg: "Errores en los parametros",
