@@ -16,7 +16,8 @@ const db = require('./config/db');
 
 const allowedOrigins = [
   'https://maxaniversario.com',
-  'https://max-panel.web.app'
+  'https://max-panel.web.app',
+  'http://localhost:5173'
 ];
 
 app.use((req, res, next) => {
