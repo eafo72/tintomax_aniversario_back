@@ -268,7 +268,7 @@ app.post("/login", async (req, res) => {
 
     if (user.tipo_usur == "Administrador") {
       return res.status(400).json({ error: true, msg: "Lo sentimos, necesitas ser cliente o colaborador para tener acceso." });
-    } 
+    }
 
     const payload = {
       user: {
@@ -305,7 +305,7 @@ app.post("/login", async (req, res) => {
         }
       );
     } else {
-      res.json({ error: true, msg: "Hubo un error"});
+      res.json({ error: true, msg: "Hubo un error" });
     }
   } catch (error) {
     console.log(error);
@@ -326,14 +326,23 @@ app.post("/loginAdmin", async (req, res) => {
       errors.push({ msg: "El campo password debe de contener un valor" });
     }
 
-    const fechaActual = new Date();
-    const inicio = new Date("2025-05-31");
-    const fin = new Date("2025-07-11");
+    //vemos si en base a las fechas de vigencia del concurso el usuario se puede loguear
+    const [rows] = await db.query("SELECT fecha_inicio, fecha_fin FROM vigencia LIMIT 1");
 
-    const soloFecha = (fecha) => new Date(fecha.getFullYear(), fecha.getMonth(), fecha.getDate());
+    if (rows.length === 0) {
+      errors.push({ msg: "No se encontró información de vigencia en la base de datos" });
+    } else {
+      const { fecha_inicio, fecha_fin } = rows[0];
+      const fechaActual = new Date();
+      const soloFecha = (fecha) => new Date(fecha.getFullYear(), fecha.getMonth(), fecha.getDate());
 
-    if (soloFecha(fechaActual) < soloFecha(inicio) || soloFecha(fechaActual) > soloFecha(fin)) {
-      errors.push({ msg: "La fecha actual no está dentro del periodo permitido (31 de mayo al 11 de julio de 2025)" });
+      const inicio = soloFecha(new Date(fecha_inicio));
+      const fin = soloFecha(new Date(fecha_fin));
+      const actual = soloFecha(fechaActual);
+
+      if (actual < inicio || actual > fin) {
+        errors.push({ msg: "La fecha actual no está dentro del periodo permitido" });
+      }
     }
 
     if (errors.length >= 1) {
@@ -364,7 +373,7 @@ app.post("/loginAdmin", async (req, res) => {
 
     if (user.tipo_usur == "Cliente" || user.tipo_usur == "Colaborador") {
       return res.status(400).json({ error: true, msg: "Lo sentimos no eres administrador" });
-    } 
+    }
 
     const payload = {
       user: {
@@ -387,7 +396,7 @@ app.post("/loginAdmin", async (req, res) => {
         }
       );
     } else {
-      res.json({ error: true, msg: "Hubo un error"});
+      res.json({ error: true, msg: "Hubo un error" });
     }
   } catch (error) {
     console.log(error);
@@ -1155,7 +1164,7 @@ app.post("/registrarTicket", upload.single("fotoTicket"), async (req, res) => {
 
       trivia_nueva = Number(ultima_trivia) + 1;
 
-      if(trivia_nueva <= 50){
+      if (trivia_nueva <= 50) {
 
         //UPDATE
         const query2 = `UPDATE conjunto_triv SET 
@@ -1175,29 +1184,29 @@ app.post("/registrarTicket", upload.single("fotoTicket"), async (req, res) => {
         ];
 
         let result2 = await db.pool.query(query2, values2);
-      }  
+      }
 
     }
 
     //enviamos correo de notificacion
     let message = {};
-    if(trivia_nueva <= 50){
+    if (trivia_nueva <= 50) {
       message = {
-      from: process.env.MAIL, 
-      to: correoUsur,
-      subject: "Nuevo ticket registrado", 
-      text: "", 
-      html: `<p>Hemos registrado tu ticket ${numeroNota}, tienes una nueva trivia liberada.</p>`,
-      };
-    }else{
-      message = {
-        from: process.env.MAIL, 
+        from: process.env.MAIL,
         to: correoUsur,
-        subject: "Nuevo ticket registrado", 
-        text: "", 
+        subject: "Nuevo ticket registrado",
+        text: "",
+        html: `<p>Hemos registrado tu ticket ${numeroNota}, tienes una nueva trivia liberada.</p>`,
+      };
+    } else {
+      message = {
+        from: process.env.MAIL,
+        to: correoUsur,
+        subject: "Nuevo ticket registrado",
+        text: "",
         html: `<p>Hemos registrado tu ticket ${numeroNota}, has alcanzado el número máximo de trivias.</p>`,
-        };
-    }  
+      };
+    }
 
     const info = await mailer.sendMail(message);
     console.log(info);
@@ -1206,22 +1215,22 @@ app.post("/registrarTicket", upload.single("fotoTicket"), async (req, res) => {
     if (firebase_token) {
 
       let message = {};
-      if(trivia_nueva <= 50){
+      if (trivia_nueva <= 50) {
 
         message = {
-        token: firebase_token,
-        webpush: {
-          fcmOptions: {
-            link: 'https://maxaniversario.com/card.html'
-          },
-          notification: {
-            title: '🎫 Nuevo ticket registrado',
-            body: 'Tienes una nueva trivia liberada.',
-            icon: '/icono.png'
+          token: firebase_token,
+          webpush: {
+            fcmOptions: {
+              link: 'https://maxaniversario.com/card.html'
+            },
+            notification: {
+              title: '🎫 Nuevo ticket registrado',
+              body: 'Tienes una nueva trivia liberada.',
+              icon: '/icono.png'
+            }
           }
-        }
         };
-      }else{
+      } else {
         message = {
           token: firebase_token,
           webpush: {
@@ -1234,29 +1243,29 @@ app.post("/registrarTicket", upload.single("fotoTicket"), async (req, res) => {
               icon: '/icono.png'
             }
           }
-          };
-      }  
+        };
+      }
 
 
       admin.messaging().send(message)
         .then((messageId) => {
           console.log('Notificación enviada, messageId =', messageId);
 
-          if(trivia_nueva <= 50){
+          if (trivia_nueva <= 50) {
             res.status(201).json({
-            error: false,
-            msg: "Hemos registrado tu ticket, tienes una nueva trivia liberada",
-            nextTrivia: trivia_nueva,
-            ticketId: result.insertId,
+              error: false,
+              msg: "Hemos registrado tu ticket, tienes una nueva trivia liberada",
+              nextTrivia: trivia_nueva,
+              ticketId: result.insertId,
             });
-          }else{
+          } else {
             res.status(201).json({
               error: false,
               msg: "Hemos registrado tu ticket, has alcanzado el número máximo de trivias.",
               nextTrivia: trivia_nueva,
               ticketId: result.insertId,
-              });
-          }  
+            });
+          }
 
         })
         .catch((err) => {
@@ -1267,12 +1276,12 @@ app.post("/registrarTicket", upload.single("fotoTicket"), async (req, res) => {
 
 
     } else {
-      if(trivia_nueva <= 50){
+      if (trivia_nueva <= 50) {
         res.status(201).json({
-        error: false,
-        msg: "Hemos registrado tu ticket, tienes una nueva trivia liberada, pero no se enviaron notificaciones",
-        nextTrivia: trivia_nueva,
-        ticketId: result.insertId,
+          error: false,
+          msg: "Hemos registrado tu ticket, tienes una nueva trivia liberada, pero no se enviaron notificaciones",
+          nextTrivia: trivia_nueva,
+          ticketId: result.insertId,
         });
       } else {
         res.status(201).json({
@@ -1280,11 +1289,11 @@ app.post("/registrarTicket", upload.single("fotoTicket"), async (req, res) => {
           msg: "Hemos registrado tu ticket, has alcanzado el número máximo de trivias, pero no se enviaron notificaciones",
           nextTrivia: trivia_nueva,
           ticketId: result.insertId,
-          });
+        });
 
-      }  
+      }
     }
-    
+
 
   } catch (error) {
     console.error("Error inesperado:", error);
