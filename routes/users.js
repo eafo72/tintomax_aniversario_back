@@ -285,7 +285,30 @@ app.post("/login", async (req, res) => {
     if (user.tipo_usur == "Cliente") {
       goToUrl = "inicio.html";
     } else if (user.tipo_usur == "Colaborador") {
+
+      //vemos si en base a las fechas de vigencia del concurso el usuario se puede loguear
+      const [rows] = await db.query("SELECT fecha_inicio, fecha_fin FROM vigencia LIMIT 1");
+
+      if (rows.length === 0) {
+        return res.status(400).json({ error: true, msg: "No se encontró información de vigencia en la base de datos" });
+      } else {
+
+        //vemos si entra en los parametros del concurso
+        const { fecha_inicio, fecha_fin } = rows[0];
+        const fechaActual = new Date();
+        const soloFecha = (fecha) => new Date(fecha.getFullYear(), fecha.getMonth(), fecha.getDate());
+
+        const inicio = soloFecha(new Date(fecha_inicio));
+        const fin = soloFecha(new Date(fecha_fin));
+        const actual = soloFecha(fechaActual);
+
+        if (actual < inicio || actual > fin) {
+          return res.status(400).json({ error: true, msg: "La fecha actual no está dentro del periodo permitido" });
+        }
+      }
+     
       goToUrl = "upload_ticket.html";
+
     }
 
     //firma del jwt  3600000 = 1hora
@@ -324,25 +347,6 @@ app.post("/loginAdmin", async (req, res) => {
     }
     if (!password) {
       errors.push({ msg: "El campo password debe de contener un valor" });
-    }
-
-    //vemos si en base a las fechas de vigencia del concurso el usuario se puede loguear
-    const [rows] = await db.query("SELECT fecha_inicio, fecha_fin FROM vigencia LIMIT 1");
-
-    if (rows.length === 0) {
-      errors.push({ msg: "No se encontró información de vigencia en la base de datos" });
-    } else {
-      const { fecha_inicio, fecha_fin } = rows[0];
-      const fechaActual = new Date();
-      const soloFecha = (fecha) => new Date(fecha.getFullYear(), fecha.getMonth(), fecha.getDate());
-
-      const inicio = soloFecha(new Date(fecha_inicio));
-      const fin = soloFecha(new Date(fecha_fin));
-      const actual = soloFecha(fechaActual);
-
-      if (actual < inicio || actual > fin) {
-        errors.push({ msg: "La fecha actual no está dentro del periodo permitido" });
-      }
     }
 
     if (errors.length >= 1) {
