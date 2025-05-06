@@ -1647,7 +1647,7 @@ app.get('/test-cron', async (req, res) => {
     await cronRanking();
     res.send('Cron ejecutado correctamente');
   } catch (err) {
-    res.status(500).send('Error al ejecutar cron');
+    res.status(500).send('Error al ejecutar cron'+err);
   }
 });
 
