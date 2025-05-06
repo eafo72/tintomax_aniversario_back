@@ -7,18 +7,48 @@ const auth = require("../middlewares/authorization");
 const db = require("../config/db");
 const mailer = require("../controller/mailController");
 
-const cloudinary = require("../config/cloudinaryConfig");
+const sharp = require("sharp");
+const AWS = require("aws-sdk");
 const multer = require("multer");
-const streamifier = require('streamifier'); // para convertir buffer en stream
+const { v4: uuidv4 } = require("uuid");
 
-const storage = multer.memoryStorage(); // guardamos en memoria, útil para subir a Cloudinary
-const upload = multer({ storage });
+// Configura multer (memoria)
+const storage = multer.memoryStorage();
+const upload = multer({ storage: storage });
 
 const bodyParser = require("body-parser");
 
 app.use(bodyParser.json({ limit: "10mb" })); // Permitir imágenes grandes en base64
 
 const admin = require('firebase-admin');
+
+const s3 = new AWS.S3({
+  accessKeyId: process.env.AWS_ACCESS_KEY_ID,
+  secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
+  region: process.env.AWS_REGION
+});
+
+// Función para subir desde buffer a S3
+const uploadToS3 = async (file) => {
+  // Redimensionar imagen
+  const resizedBuffer = await sharp(file.buffer)
+    .resize({ width: 800, height: 800, fit: "inside" }) // Mantiene proporción, máximo 800x800
+    .toFormat("jpeg") // O "png" si prefieres
+    .jpeg({ quality: 80 }) // Calidad al 80%
+    .toBuffer();
+
+  const key = `imagenes/${uuidv4()}.jpeg`;
+
+  const params = {
+    Bucket: process.env.AWS_BUCKET_NAME,
+    Key: key,
+    Body: resizedBuffer,
+    ContentType: "image/jpeg",
+    ACL: "public-read",
+  };
+
+  return s3.upload(params).promise(); // { Location: ..., Key: ... }
+};
 
 
 app.get("/usuarios", async (req, res) => {
@@ -1027,6 +1057,7 @@ app.put("/delete", async (req, res) => {
 });
 
 app.post("/registrarTicket", upload.single("fotoTicket"), async (req, res) => {
+  
   try {
     const {
       numeroNota,
@@ -1106,24 +1137,10 @@ app.post("/registrarTicket", upload.single("fotoTicket"), async (req, res) => {
     console.log("FB token" + firebase_token);
     const correoUsur = rows[0].correo_usur;
 
-    // Subir imagen a Cloudinary desde buffer
-    const uploadFromBuffer = () => {
-      return new Promise((resolve, reject) => {
-        const stream = cloudinary.uploader.upload_stream(
-          { folder: "imagenes", resource_type: "image" },
-          (error, result) => {
-            if (result) resolve(result);
-            else reject(error);
-          }
-        );
-        streamifier.createReadStream(req.file.buffer).pipe(stream);
-      });
-    };
-
-    let uploadResult = await uploadFromBuffer();
-    let imageUrl = uploadResult.secure_url;
-
-
+    // Subir imagen a AWS
+    const uploadResult = await uploadToS3(req.file);
+    const imageUrl = uploadResult.Location; 
+    
     let trivia = 0;
     let puntos = 0;
 
