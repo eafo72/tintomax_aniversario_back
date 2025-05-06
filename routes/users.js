@@ -50,36 +50,6 @@ const uploadToS3 = async (file) => {
 };
 
 
-async function cronRanking() {
-  try {
-    let today = new Date();
-    let date = today.getFullYear() + '-' + (today.getMonth() + 1) + '-' + today.getDate();
-    let time = today.getHours() + ':' + today.getMinutes() + ':' + today.getSeconds();
-    let fecha = date + ' ' + time;
-
-    //Actualizar el ranking
-    const updateRankingQuery = `
-      UPDATE usuarios 
-      JOIN (SELECT id_usuario, 
-         RANK() OVER (ORDER BY acumulado_usur DESC) AS nueva_posicion
-         FROM usuarios) AS ranking 
-         ON usuarios.id_usuario = ranking.id_usuario
-      SET usuarios.ranking_usur = ranking.nueva_posicion;
-    `;
-    await db.pool.query(updateRankingQuery);
-
-    const updateRankingTableQuery = `UPDATE ranking SET lastUpdated = '${fecha}' WHERE idRanking = 1`;
-    await db.pool.query(updateRankingTableQuery);
-
-
-    console.log("Cron job realizado");
-
-
-  } catch (error) {
-    console.log(error);
-    console.log("Cron job NO realizado");
-  }
-}
 
 app.get("/usuarios", async (req, res) => {
   try {
@@ -1673,6 +1643,7 @@ app.post('/save-token', async (req, res) => {
 
 });
 
+//para probar hay que traer la funcion a este archivo
 app.get('/test-cron', async (req, res) => {
   try {
     await cronRanking();

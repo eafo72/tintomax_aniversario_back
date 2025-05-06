@@ -98,7 +98,7 @@ async function cronRanking() {
     `;
     await db.pool.query(updateRankingQuery);
 
-    const updateRankingTableQuery = `UPDATE ranking SET lastUpdated = ${fecha} WHERE idRanking = 1`;
+    const updateRankingTableQuery = `UPDATE ranking SET lastUpdated = '${fecha}' WHERE idRanking = 1`;
     await db.pool.query(updateRankingTableQuery);
 
 
