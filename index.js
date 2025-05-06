@@ -83,9 +83,28 @@ QQ3RyudOh/2uCQtNiHcQeGQB
 async function cronRanking() {
   try {
     let today = new Date();
-    let date = today.getFullYear() + '-' + (today.getMonth() + 1) + '-' + today.getDate();
-    let time = today.getHours() + ':' + today.getMinutes() + ':' + today.getSeconds();
-    let fecha = date + ' ' + time;
+
+    // Formatear la fecha y hora con la zona horaria específica
+    let options = {
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit',
+      hour: '2-digit',
+      minute: '2-digit',
+      second: '2-digit',
+      hour12: false,
+      timeZone: 'America/Mexico_City', // Especificar la zona horaria
+    };
+
+    let fechaLocal = new Intl.DateTimeFormat('en-GB', options).format(today);
+
+    // Separar fecha y hora
+    let [date, time] = fechaLocal.split(', ');
+    let [day, month, year] = date.split('/');
+    let [hour, minute, second] = time.split(':');
+
+    // Crear la fecha con el formato correcto para SQL
+    let fecha = `${year}-${month}-${day} ${hour}:${minute}:${second}`;
 
     //Actualizar el ranking
     const updateRankingQuery = `
