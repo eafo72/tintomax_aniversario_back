@@ -1642,5 +1642,13 @@ app.post('/save-token', async (req, res) => {
 
 });
 
+app.get('/test-cron', async (req, res) => {
+  try {
+    await cronRanking();
+    res.send('Cron ejecutado correctamente');
+  } catch (err) {
+    res.status(500).send('Error al ejecutar cron');
+  }
+});
 
 module.exports = app;
