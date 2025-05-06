@@ -43,7 +43,7 @@ const uploadToS3 = async (file) => {
     Bucket: process.env.AWS_BUCKET_NAME,
     Key: key,
     Body: resizedBuffer,
-    ContentType: "image/jpeg,
+    ContentType: "image/jpeg"
   };
 
   return s3.upload(params).promise(); // { Location: ..., Key: ... }
