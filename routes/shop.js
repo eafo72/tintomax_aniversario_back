@@ -67,4 +67,29 @@ ORDER BY c.fecha_comp`;
 });
 
 
+
+app.get("/colaboradores", async (req, res) => {
+  try {
+    let query = `SELECT 
+    u.nombre_usur,
+    c.id_usuario_vend_comp,
+    COUNT(*) AS total_compras
+    FROM compras c
+    INNER JOIN usuarios u ON c.id_usuario_vend_comp = u.id_usuario
+    GROUP BY c.id_usuario_vend_comp, u.nombre_usur
+    ORDER BY total_compras ASC
+        `;
+    let colaboradores = await db.pool.query(query);
+    colaboradores = colaboradores[0];
+
+    res.status(200).json({ error: false, colaboradores });
+  } catch (error) {
+    res.status(500).json({
+      msg: "Hubo un error obteniendo los datos",
+      error: true,
+      details: error,
+    });
+  }
+});
+
 module.exports = app;
