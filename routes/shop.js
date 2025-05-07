@@ -73,10 +73,12 @@ app.get("/colaboradores", async (req, res) => {
     let query = `SELECT 
     u.nombre_usur,
     c.id_usuario_vend_comp,
+    s.nombreSucursal,
     COUNT(*) AS total_compras,
     SUM(c.monto_comp) AS suma_montos
     FROM compras c
     INNER JOIN usuarios u ON c.id_usuario_vend_comp = u.id_usuario
+    INNER JOIN sucursales s ON u.id_sucursal = s.idSucursal
     GROUP BY c.id_usuario_vend_comp, u.nombre_usur
     ORDER BY total_compras ASC
         `;
