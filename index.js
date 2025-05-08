@@ -130,16 +130,13 @@ async function cronRanking() {
   }
 }
 
-//CRON para marcar actualizar ranking
-//At 01:00 on every day-of-week from Sunday through Saturday. www.crontab.guru
-cron.schedule("0 1 * * 0-6", function () {
+cron.schedule("0 1 * * *", function () {
   console.log("---------------------");
-  console.log("running a cron job every day");
-
+  console.log("running a cron job every day at 1:00 AM");
   cronRanking();
-
+}, {
+  timezone: "America/Mexico_City"
 });
-
 
 //rutas
 app.use('/usuario', userRoutes);

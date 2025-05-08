@@ -278,7 +278,7 @@ app.post("/login", async (req, res) => {
       });
     }
 
-    let query = `SELECT * FROM usuarios WHERE correo_usur = '${email}' AND estatus_usur != 'cancelado'`;
+    let query = `SELECT * FROM usuarios WHERE correo_usur = '${email}'`;
 
     let user = await db.pool.query(query);
 
@@ -294,6 +294,10 @@ app.post("/login", async (req, res) => {
 
     if (!passCorrecto) {
       return res.status(400).json({ error: true, msg: "Password incorrecto" });
+    }
+
+    if (user.estatus_usur == 'cancelado') {
+      return res.status(400).json({ error: true, msg: `Lo sentimos, el correo ${email} fué dado de baja.` });
     }
 
     if (user.tipo_usur == "Administrador") {
@@ -336,7 +340,7 @@ app.post("/login", async (req, res) => {
           return res.status(400).json({ error: true, msg: "La fecha actual no está dentro del periodo permitido" });
         }
       }
-     
+
       goToUrl = "upload_ticket.html";
 
     }
@@ -522,6 +526,12 @@ app.post("/resetpass", async (req, res) => {
       return res.status(400).json({ error: true, msg: "El usuario no existe" });
     }
 
+    user = user[0];
+
+    if (user.estatus_usur == 'cancelado') {
+      return res.status(400).json({ error: true, msg: `Lo sentimos, el correo ${email} fué dado de baja.` });
+    }
+
     let newpass = Math.random().toString(36).substring(0, 10);
 
     let message = {
@@ -631,7 +641,7 @@ app.post("/verificar", auth, async (req, res) => {
           return res.status(400).json({ error: true, msg: "La fecha actual no está dentro del periodo permitido" });
         }
       }
-    
+
     }
 
     // Devolvemos los datos del usuario
@@ -1057,7 +1067,7 @@ app.put("/delete", async (req, res) => {
 });
 
 app.post("/registrarTicket", upload.single("fotoTicket"), async (req, res) => {
-  
+
   try {
     const {
       numeroNota,
@@ -1139,8 +1149,8 @@ app.post("/registrarTicket", upload.single("fotoTicket"), async (req, res) => {
 
     // Subir imagen a AWS
     const uploadResult = await uploadToS3(req.file);
-    const imageUrl = uploadResult.Location; 
-    
+    const imageUrl = uploadResult.Location;
+
     let trivia = 0;
     let puntos = 0;
 
@@ -1237,7 +1247,19 @@ app.post("/registrarTicket", upload.single("fotoTicket"), async (req, res) => {
 
     }
 
-    //enviamos correo de notificacion
+  } catch (error) {
+    console.error("Error guardando datos:", error);
+    res
+      .status(500)
+      .json({ error: true, msg: "Error guardando datos" });
+  }
+
+
+  /////////////////////////////////////////////////////////////////////////// notificaciones   ///////////////////////////////////////////////////////////////
+
+  //enviamos correo de notificacion
+  try {
+
     let message = {};
     if (trivia_nueva <= 50) {
       message = {
@@ -1259,96 +1281,95 @@ app.post("/registrarTicket", upload.single("fotoTicket"), async (req, res) => {
 
     const info = await mailer.sendMail(message);
     console.log(info);
+  } catch (error) {
+    console.error("Error enviando correo:", error);
+    res
+      .status(500)
+      .json({ error: true, msg: "Error enviando correo" });
+  }
 
-    //le avisamos al usuario
-    if (firebase_token) {
 
-      let message = {};
-      if (trivia_nueva <= 50) {
+  //le avisamos al usuario
+  if (firebase_token) {
 
-        message = {
-          token: firebase_token,
-          webpush: {
-            fcmOptions: {
-              link: 'https://maxaniversario.com/card.html'
-            },
-            notification: {
-              title: '🎫 Nuevo ticket registrado',
-              body: 'Tienes una nueva trivia liberada.',
-              icon: '/icono.png'
-            }
+    let message = {};
+    if (trivia_nueva <= 50) {
+
+      message = {
+        token: firebase_token,
+        webpush: {
+          fcmOptions: {
+            link: 'https://maxaniversario.com/card.html'
+          },
+          notification: {
+            title: '🎫 Nuevo ticket registrado',
+            body: 'Tienes una nueva trivia liberada.',
+            icon: '/icono.png'
           }
-        };
-      } else {
-        message = {
-          token: firebase_token,
-          webpush: {
-            fcmOptions: {
-              link: 'https://maxaniversario.com/card.html'
-            },
-            notification: {
-              title: '🎫 Nuevo ticket registrado',
-              body: 'Has alcanzado el número máximo de trivias',
-              icon: '/icono.png'
-            }
-          }
-        };
-      }
-
-
-      admin.messaging().send(message)
-        .then((messageId) => {
-          console.log('Notificación enviada, messageId =', messageId);
-
-          if (trivia_nueva <= 50) {
-            res.status(201).json({
-              error: false,
-              msg: "Hemos registrado tu ticket, tienes una nueva trivia liberada",
-              nextTrivia: trivia_nueva,
-              ticketId: result.insertId,
-            });
-          } else {
-            res.status(201).json({
-              error: false,
-              msg: "Hemos registrado tu ticket, has alcanzado el número máximo de trivias.",
-              nextTrivia: trivia_nueva,
-              ticketId: result.insertId,
-            });
-          }
-
-        })
-        .catch((err) => {
-          console.error('Error al enviar la notificación:', err);
-          res.status(500).send('Error al enviar la notificación');
-        });
-
-
-
+        }
+      };
     } else {
-      if (trivia_nueva <= 50) {
-        res.status(201).json({
-          error: false,
-          msg: "Hemos registrado tu ticket, tienes una nueva trivia liberada, pero no se enviaron notificaciones",
-          nextTrivia: trivia_nueva,
-          ticketId: result.insertId,
-        });
-      } else {
-        res.status(201).json({
-          error: false,
-          msg: "Hemos registrado tu ticket, has alcanzado el número máximo de trivias, pero no se enviaron notificaciones",
-          nextTrivia: trivia_nueva,
-          ticketId: result.insertId,
-        });
-
-      }
+      message = {
+        token: firebase_token,
+        webpush: {
+          fcmOptions: {
+            link: 'https://maxaniversario.com/card.html'
+          },
+          notification: {
+            title: '🎫 Nuevo ticket registrado',
+            body: 'Has alcanzado el número máximo de trivias',
+            icon: '/icono.png'
+          }
+        }
+      };
     }
 
 
-  } catch (error) {
-    console.error("Error inesperado:", error);
-    res
-      .status(500)
-      .json({ error: true, msg: "Error inesperado en el servidor" });
+    admin.messaging().send(message)
+      .then((messageId) => {
+        console.log('Notificación enviada, messageId =', messageId);
+
+        if (trivia_nueva <= 50) {
+          res.status(201).json({
+            error: false,
+            msg: "Hemos registrado tu ticket, tienes una nueva trivia liberada",
+            nextTrivia: trivia_nueva,
+            ticketId: result.insertId,
+          });
+        } else {
+          res.status(201).json({
+            error: false,
+            msg: "Hemos registrado tu ticket, has alcanzado el número máximo de trivias.",
+            nextTrivia: trivia_nueva,
+            ticketId: result.insertId,
+          });
+        }
+
+      })
+      .catch((err) => {
+        console.error('Error al enviar la notificación:', err);
+        res.status(500).send('Error al enviar la notificación');
+      });
+
+
+
+  } else {
+    if (trivia_nueva <= 50) {
+      res.status(201).json({
+        error: false,
+        msg: "Hemos registrado tu ticket, tienes una nueva trivia liberada, pero no se enviaron notificaciones",
+        nextTrivia: trivia_nueva,
+        ticketId: result.insertId,
+      });
+    } else {
+      res.status(201).json({
+        error: false,
+        msg: "Hemos registrado tu ticket, has alcanzado el número máximo de trivias, pero no se enviaron notificaciones",
+        nextTrivia: trivia_nueva,
+        ticketId: result.insertId,
+      });
+
+    }
   }
 });
 
@@ -1650,7 +1671,7 @@ app.get('/test-cron', async (req, res) => {
     await cronRanking();
     res.send('Cron ejecutado correctamente');
   } catch (err) {
-    res.status(500).send('Error al ejecutar cron'+err);
+    res.status(500).send('Error al ejecutar cron' + err);
   }
 });
 
