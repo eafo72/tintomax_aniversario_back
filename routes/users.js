@@ -1068,30 +1068,38 @@ app.put("/delete", async (req, res) => {
 
 app.post("/registrarTicket", upload.single("fotoTicket"), async (req, res) => {
 
-  try {
-    const {
-      numeroNota,
-      idUnidad,
-      cantidadPrendas,
-      total,
-      fechaCompra,
-      idCliente,
-      idVendedor,
-    } = req.body;
+  let firebase_token = null;
+  let ultima_trivia = 0;
+  let trivia_nueva = 0;
 
-    // Validaciones básicas
-    if (
-      !numeroNota ||
-      !idUnidad ||
-      !cantidadPrendas ||
-      !total ||
-      !fechaCompra ||
-      !req.file
-    ) {
-      return res
-        .status(400)
-        .json({ error: true, msg: "Faltan datos requeridos" });
-    }
+  let correoUsur = null;
+  let idCompra = null;
+
+  const {
+    numeroNota,
+    idUnidad,
+    cantidadPrendas,
+    total,
+    fechaCompra,
+    idCliente,
+    idVendedor,
+  } = req.body;
+
+  // Validaciones básicas
+  if (
+    !numeroNota ||
+    !idUnidad ||
+    !cantidadPrendas ||
+    !total ||
+    !fechaCompra ||
+    !req.file
+  ) {
+    return res
+      .status(400)
+      .json({ error: true, msg: "Faltan datos requeridos" });
+  }
+
+  try {
 
     //vemos si existe el id del cliente
     let selectQuery = `SELECT id_usuario FROM usuarios WHERE id_usuario = ? AND tipo_usur = "Cliente"`;
@@ -1143,9 +1151,9 @@ app.post("/registrarTicket", upload.single("fotoTicket"), async (req, res) => {
         .json({ error: true, msg: "La sucursal seleccionada no le corresponde al Cliente" });
     }
 
-    const firebase_token = rows[0].firebase_token;
+    firebase_token = rows[0].firebase_token;
     console.log("FB token" + firebase_token);
-    const correoUsur = rows[0].correo_usur;
+    correoUsur = rows[0].correo_usur;
 
     // Subir imagen a AWS
     const uploadResult = await uploadToS3(req.file);
@@ -1206,8 +1214,7 @@ app.post("/registrarTicket", upload.single("fotoTicket"), async (req, res) => {
     let result = await db.pool.query(query, values);
     result = result[0];
 
-    let ultima_trivia = 0;
-    let trivia_nueva = 0;
+    idCompra = result.insertId;
 
     //solo agrega trivia si puntos > 0
     if (puntos > 0) {
@@ -1234,7 +1241,7 @@ app.post("/registrarTicket", upload.single("fotoTicket"), async (req, res) => {
                 WHERE num_trivia = ? AND id_user_conj = ?`;
 
         const values2 = [
-          result.insertId,
+          idCompra,
           idUnidad,
           puntos,
           "asignada",
@@ -1334,14 +1341,14 @@ app.post("/registrarTicket", upload.single("fotoTicket"), async (req, res) => {
             error: false,
             msg: "Hemos registrado tu ticket, tienes una nueva trivia liberada",
             nextTrivia: trivia_nueva,
-            ticketId: result.insertId,
+            ticketId: idCompra,
           });
         } else {
           res.status(201).json({
             error: false,
             msg: "Hemos registrado tu ticket, has alcanzado el número máximo de trivias.",
             nextTrivia: trivia_nueva,
-            ticketId: result.insertId,
+            ticketId: idCompra,
           });
         }
 
@@ -1359,14 +1366,14 @@ app.post("/registrarTicket", upload.single("fotoTicket"), async (req, res) => {
         error: false,
         msg: "Hemos registrado tu ticket, tienes una nueva trivia liberada, pero no se enviaron notificaciones",
         nextTrivia: trivia_nueva,
-        ticketId: result.insertId,
+        ticketId: idCompra,
       });
     } else {
       res.status(201).json({
         error: false,
         msg: "Hemos registrado tu ticket, has alcanzado el número máximo de trivias, pero no se enviaron notificaciones",
         nextTrivia: trivia_nueva,
-        ticketId: result.insertId,
+        ticketId: idCompra,
       });
 
     }
