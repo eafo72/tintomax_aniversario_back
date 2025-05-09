@@ -293,7 +293,7 @@ app.post("/login", async (req, res) => {
     const passCorrecto = await bcryptjs.compare(password, user.pass);
 
     if (!passCorrecto) {
-      return res.status(400).json({ error: true, msg: "Password incorrecto" });
+      return res.status(400).json({ error: true, msg: "Contraseña incorrecta" });
     }
 
     if (user.estatus_usur == 'cancelado') {
@@ -406,7 +406,7 @@ app.post("/loginAdmin", async (req, res) => {
     const passCorrecto = await bcryptjs.compare(password, user.pass);
 
     if (!passCorrecto) {
-      return res.status(400).json({ error: true, msg: "Password incorrecto" });
+      return res.status(400).json({ error: true, msg: "Contraseña incorrecta" });
     }
 
     if (user.tipo_usur == "Cliente" || user.tipo_usur == "Colaborador") {
@@ -1137,7 +1137,7 @@ app.post("/registrarTicket", upload.single("fotoTicket"), async (req, res) => {
     if (rows.length > 0) {
       return res
         .status(404)
-        .json({ error: true, msg: "La nota ya fue registrada" });
+        .json({ error: true, msg: "Verifica el número de nota, ésta ya fue registrada" });
     }
 
 
