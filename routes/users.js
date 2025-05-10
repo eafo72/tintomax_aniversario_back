@@ -1422,7 +1422,7 @@ app.get("/rank5", async (req, res) => {
 		nombre_usur,
 		acumulado_usur,
     ranking_usur
-    FROM usuarios WHERE tipo_usur = 'Cliente' AND acumulado_usur IS NOT NULL ORDER BY ranking_usur ASC LIMIT 5
+    FROM usuarios WHERE tipo_usur = 'Cliente' AND acumulado_usur IS NOT NULL AND ranking_usur IS NOT NULL  ORDER BY ranking_usur ASC LIMIT 5
         `;
     let rank5 = await db.pool.query(query);
     rank5 = rank5[0];
@@ -1453,7 +1453,7 @@ app.get("/rank5Store/:id", async (req, res) => {
 		nombre_usur,
 		acumulado_usur,
     ranking_usur
-    FROM usuarios WHERE tipo_usur = 'Cliente' AND acumulado_usur IS NOT NULL AND id_sucursal = ? ORDER BY ranking_usur ASC LIMIT 5
+    FROM usuarios WHERE tipo_usur = 'Cliente' AND acumulado_usur IS NOT NULL AND ranking_usur IS NOT NULL AND id_sucursal = ? ORDER BY ranking_usur ASC LIMIT 5
         `;
     let rank5Store = await db.pool.query(query, [storeId]);
     rank5Store = rank5Store[0];
@@ -1555,7 +1555,7 @@ app.get("/rankPositionStore/:id/:idSucursal", async (req, res) => {
         acumulado_usur,
         ROW_NUMBER() OVER (ORDER BY acumulado_usur DESC) AS ranking
       FROM usuarios
-      WHERE tipo_usur = 'Cliente' AND acumulado_usur IS NOT NULL AND id_sucursal = ?
+      WHERE tipo_usur = 'Cliente' AND acumulado_usur IS NOT NULL AND ranking_usur IS NOT NULL AND id_sucursal = ?
     ) AS subquery
     WHERE id_usuario = ?
     `;
