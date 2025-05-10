@@ -14,10 +14,10 @@ require('dotenv').config();
 
 const db = require('./config/db');
 
+//http://localhost:5173
 const allowedOrigins = [
   'https://maxaniversario.com',
-  'https://max-panel.web.app',
-  'http://localhost:5173'
+  'https://max-panel.web.app'
 ];
 
 app.use((req, res, next) => {
