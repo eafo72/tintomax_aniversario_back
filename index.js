@@ -17,7 +17,8 @@ const db = require('./config/db');
 //http://localhost:5173
 const allowedOrigins = [
   'https://maxaniversario.com',
-  'https://max-panel.web.app'
+  'https://max-panel.web.app',
+  'https://agencianuba.com'
 ];
 
 app.use((req, res, next) => {
