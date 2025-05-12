@@ -7,7 +7,7 @@ module.exports = function generarEmail(nombre, token) {
         <title>Confirmación de cuenta</title>
       </head>
       <body style="margin:0; padding:0; font-family:Arial, sans-serif; ">
-        <table width="100%" cellpadding="0" cellspacing="0" border="0" bgcolor="#e0f7fa">
+        <table width="600" cellpadding="0" cellspacing="0" border="0" bgcolor="#e0f7fa">
           <tr>
             <td align="center">
               <table width="600" cellpadding="20" cellspacing="0" border="0" style="background-color: #ffffff;">
@@ -17,10 +17,10 @@ module.exports = function generarEmail(nombre, token) {
                   </td>
                 </tr>
                 <tr>
-                  <td>
+                  <td style="padding-left: 40px;padding-right: 40px;">
                     <h2 style="color:#00695c; font-weight: bolder; font-family:Arial, sans-serif;">¡Hola, ${nombre}!</h2>
                     <p style="font-size:16px; color:#004d40;">
-                      Ya falta poco para que puedas participar en la dinámica del <br> 55 Aniversario de Tintorerías MAX.
+                      Ya falta poco para que puedas participar en la dinámica del 55 Aniversario de Tintorerías MAX.
                     </p>
                     <p style="font-size:16px; color:#004d40;">
                       Por favor, confirma tu correo electrónico dando click en el siguiente enlace e inicia sesión, al confimar tu correo y registrar una compra, podrás contestar una trivia por cada registro y acumular puntos.
