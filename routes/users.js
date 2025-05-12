@@ -8,6 +8,7 @@ const db = require("../config/db");
 const mailer = require("../controller/mailController");
 
 const confirmarCuentaTemplate = require('../templates/emailTemplate-ConfirmarCuenta');
+const cambiarContrasenaTemplate = require('../templates/emailTemplate-CambiarContrasena');
 
 const sharp = require("sharp");
 const AWS = require("aws-sdk");
@@ -537,12 +538,12 @@ app.post("/resetpass", async (req, res) => {
 
     let newpass = Math.random().toString(36).substring(0, 10);
 
+    
     let message = {
-      from: process.env.MAIL, // sender address
-      to: email, // list of receivers
-      subject: "Cambio de Contraseña", // Subject line
-      text: "", // plain text body
-      html: `<p>Su nueva contraseña es: ${newpass}</p>`, // html body
+      from: process.env.MAIL,
+      to: email,
+      subject: "Cambio de Contraseña",
+      html: cambiarContrasenaTemplate(user.nombre_usur, newpass), // Usas el nombre y el token aquí
     };
 
     const info = await mailer.sendMail(message);
