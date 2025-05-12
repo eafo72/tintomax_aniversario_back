@@ -9,6 +9,7 @@ const mailer = require("../controller/mailController");
 
 const confirmarCuentaTemplate = require('../templates/emailTemplate-ConfirmarCuenta');
 const cambiarContrasenaTemplate = require('../templates/emailTemplate-CambiarContrasena');
+const compraRegistradaTemplate  = require('../templates/emailTemplate-CompraRegistrada');
 
 const sharp = require("sharp");
 const AWS = require("aws-sdk");
@@ -1075,6 +1076,7 @@ app.post("/registrarTicket", upload.single("fotoTicket"), async (req, res) => {
   let trivia_nueva = 0;
 
   let correoUsur = null;
+  let nombreUsur = null;
   let idCompra = null;
 
   const {
@@ -1144,7 +1146,7 @@ app.post("/registrarTicket", upload.single("fotoTicket"), async (req, res) => {
 
 
     //vemos si existe el id de sucursal corresponde al cliente si existe traemos el token de firebase
-    selectQuery = `SELECT id_usuario, firebase_token, correo_usur FROM usuarios WHERE id_usuario = ? AND id_sucursal = ?`;
+    selectQuery = `SELECT id_usuario, firebase_token, correo_usur, nombre_usur FROM usuarios WHERE id_usuario = ? AND id_sucursal = ?`;
     [rows] = await db.pool.query(selectQuery, [idCliente, idUnidad]);
 
     if (rows.length === 0) {
@@ -1156,6 +1158,7 @@ app.post("/registrarTicket", upload.single("fotoTicket"), async (req, res) => {
     firebase_token = rows[0].firebase_token;
     console.log("FB token" + firebase_token);
     correoUsur = rows[0].correo_usur;
+    nombreUsur = rows[0].nombre_usur;
 
     // Subir imagen a AWS
     const uploadResult = await uploadToS3(req.file);
@@ -1269,24 +1272,22 @@ app.post("/registrarTicket", upload.single("fotoTicket"), async (req, res) => {
   //enviamos correo de notificacion
   try {
 
-    let message = {};
+    let texto = null;
+
     if (trivia_nueva <= 50) {
-      message = {
-        from: process.env.MAIL,
-        to: correoUsur,
-        subject: "Nuevo ticket registrado",
-        text: "",
-        html: `<p>Hemos registrado tu ticket ${numeroNota}, tienes una nueva trivia liberada.</p>`,
-      };
+      texto = "Tienes una nueva trivia liberada"
     } else {
-      message = {
-        from: process.env.MAIL,
-        to: correoUsur,
-        subject: "Nuevo ticket registrado",
-        text: "",
-        html: `<p>Hemos registrado tu ticket ${numeroNota}, has alcanzado el número máximo de trivias.</p>`,
-      };
+      texto = "Has alcanzado el número máximo de trivias";
     }
+
+    let message = {
+      from: process.env.MAIL,
+      to: correoUsur,
+      subject: "Nuevo ticket registrado",
+      html: compraRegistradaTemplate(nombreUsur, numeroNota, texto), 
+    };
+
+
 
     const info = await mailer.sendMail(message);
     console.log(info);
