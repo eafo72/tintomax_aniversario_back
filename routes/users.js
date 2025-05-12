@@ -552,8 +552,6 @@ app.post("/resetpass", async (req, res) => {
     const salt = await bcryptjs.genSalt(10);
     const hashedPassword = await bcryptjs.hash(newpass, salt);
 
-    user = user[0];
-
     query = `UPDATE usuarios  SET
 						pass    = '${hashedPassword}', 
 						updated_at  = '${fecha}'
