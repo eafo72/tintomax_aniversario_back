@@ -537,7 +537,7 @@ app.post("/resetpass", async (req, res) => {
       return res.status(400).json({ error: true, msg: `Lo sentimos, el correo ${email} fué dado de baja.` });
     }
 
-    let newpass = Math.random().toString(36).substring(0, 10);
+    let newpass = Math.random().toString(36).substring(0, 5);
 
     
     let message = {
