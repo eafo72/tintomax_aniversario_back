@@ -7,6 +7,8 @@ const auth = require("../middlewares/authorization");
 const db = require("../config/db");
 const mailer = require("../controller/mailController");
 
+const confirmarCuentaTemplate = require('../templates/emailTemplate-ConfirmarCuenta');
+
 const sharp = require("sharp");
 const AWS = require("aws-sdk");
 const multer = require("multer");
@@ -237,12 +239,13 @@ app.post("/crear", async (req, res) => {
 
     //enviamos correo para que confirme su cuenta
     let message = {
-      from: process.env.MAIL, // sender address
-      to: correo_usur, // list of receivers
-      subject: "Confirma tu cuenta", // Subject line
-      text: "", // plain text body
-      html: `<p>Haz click en el enlace para confirmar tu cuenta</p><a href="http://maxaniversario.com/verified.html?token=${token}">Confirma tu cuenta</a>`,
+      from: process.env.MAIL,
+      to: correo_usur,
+      subject: "Confirma tu cuenta",
+      html: confirmarCuentaTemplate(nombre_usur, token), // Usas el nombre y el token aquí
     };
+
+
     const info = await mailer.sendMail(message);
     console.log(info);
 
