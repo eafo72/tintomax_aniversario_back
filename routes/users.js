@@ -22,6 +22,16 @@ app.use(bodyParser.json({ limit: "10mb" })); // Permitir imágenes grandes en ba
 
 const admin = require('firebase-admin');
 
+const mailer = nodemailer.createTransport({
+  host: 'email-smtp.us-east-2.amazonaws.com',
+  port: 587,
+  secure: false,
+  auth: {
+    user: process.env.SES_USER,
+    pass: process.env.SES_PASSWORD
+  }
+});
+
 const s3 = new AWS.S3({
   accessKeyId: process.env.AWS_ACCESS_KEY_ID,
   secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
