@@ -9,7 +9,7 @@ const mailer = require("../controller/mailController");
 
 const confirmarCuentaTemplate = require('../templates/emailTemplate-ConfirmarCuenta');
 const cambiarContrasenaTemplate = require('../templates/emailTemplate-CambiarContrasena');
-const compraRegistradaTemplate  = require('../templates/emailTemplate-CompraRegistrada');
+const compraRegistradaTemplate = require('../templates/emailTemplate-CompraRegistrada');
 
 const sharp = require("sharp");
 const AWS = require("aws-sdk");
@@ -539,7 +539,7 @@ app.post("/resetpass", async (req, res) => {
 
     let newpass = Math.random().toString(36).substring(0, 5);
 
-    
+
     let message = {
       from: process.env.MAIL,
       to: email,
@@ -685,6 +685,65 @@ app.post("/verifyAccount", auth, async (req, res) => {
     res.status(500).json({ error: true, msg: "Error en el servidor" });
   }
 });
+
+
+app.post("/reenviarCorreoConfirmacion", async (req, res) => {
+
+  const { userId } = req.body;
+
+  if (!userId) {
+    return res
+      .status(400)
+      .json({ error: true, msg: "Falta el userId" });
+  }
+
+  try {
+
+    selectQuery = `SELECT correo_usur FROM usuarios WHERE id_usuario = ?`;
+    [rows] = await db.pool.query(selectQuery, [userId]);
+
+    if (rows.length === 0) {
+      return res
+        .status(404)
+        .json({ error: true, msg: "Usuario no encontrado" });
+    }
+
+    nombreUsur = rows[0].nombre_usur;
+    correoUsur = rows[0].correo_usur;
+
+
+    //crear token
+    const payload = {
+      user: {
+        id: userId,
+        correo: correo_usur,
+      },
+    };
+
+    const token = jwt.sign(payload, process.env.SECRET, { expiresIn: "60d" });
+
+    //enviamos correo para que confirme su cuenta
+    let message = {
+      from: process.env.MAIL,
+      to: correo_usur,
+      subject: "Confirma tu cuenta",
+      html: confirmarCuentaTemplate(nombre_usur, token), // Usas el nombre y el token aquí
+    };
+
+
+    const info = await mailer.sendMail(message);
+    console.log(info);
+
+    res.status(200).json({ error: false, msg: "Correo enviado exitosamente" });
+
+  } catch (error) {
+    console.error("Error enviando correo:", error);
+    res
+      .status(500)
+      .json({ error: true, msg: "Error enviando correo" });
+  }
+});
+
 
 app.put("/set", async (req, res) => {
   try {
@@ -1284,7 +1343,7 @@ app.post("/registrarTicket", upload.single("fotoTicket"), async (req, res) => {
       from: process.env.MAIL,
       to: correoUsur,
       subject: "Nuevo ticket registrado",
-      html: compraRegistradaTemplate(nombreUsur, numeroNota, texto), 
+      html: compraRegistradaTemplate(nombreUsur, numeroNota, texto),
     };
 
 
