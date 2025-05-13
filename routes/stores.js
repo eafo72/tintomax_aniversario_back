@@ -8,7 +8,7 @@ app.use(bodyParser.json({ limit: "10mb" })); // Permitir imágenes grandes en ba
 
 app.get("/sucursales", async (req, res) => {
   try {
-    let query = `SELECT * FROM sucursales`;
+    let query = `SELECT * FROM sucursales ORDER BY nombreSucursal ASC`;
     let sucursales = await db.pool.query(query);
     sucursales = sucursales[0];
 
