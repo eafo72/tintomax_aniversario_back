@@ -708,8 +708,8 @@ app.post("/reenviarCorreoConfirmacion", async (req, res) => {
         .json({ error: true, msg: "Usuario no encontrado" });
     }
 
-    nombreUsur = rows[0].nombre_usur;
-    correoUsur = rows[0].correo_usur;
+    nombre_usur = rows[0].nombre_usur;
+    correo_usur = rows[0].correo_usur;
 
 
     //crear token
