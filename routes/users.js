@@ -699,7 +699,7 @@ app.post("/reenviarCorreoConfirmacion", async (req, res) => {
 
   try {
 
-    selectQuery = `SELECT correo_usur FROM usuarios WHERE id_usuario = ?`;
+    selectQuery = `SELECT correo_usur, nombre_usur FROM usuarios WHERE id_usuario = ?`;
     [rows] = await db.pool.query(selectQuery, [userId]);
 
     if (rows.length === 0) {
