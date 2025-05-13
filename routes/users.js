@@ -835,7 +835,7 @@ app.put("/set", async (req, res) => {
 
     res
       .status(200)
-      .json({ error: false, msg: "Registro actualizado con exito" });
+      .json({ error: false, msg: "Registro actualizado con éxito" });
   } catch (error) {
     res.status(400).json({ error: true, details: error });
   }
@@ -888,7 +888,7 @@ app.put("/setName", async (req, res) => {
 
     res
       .status(200)
-      .json({ error: false, msg: "Registro actualizado con exito" });
+      .json({ error: false, msg: "Registro actualizado con éxito" });
   } catch (error) {
     res.status(400).json({ error: true, details: error });
   }
@@ -952,7 +952,7 @@ app.put("/setPhone", async (req, res) => {
 
     res
       .status(200)
-      .json({ error: false, msg: "Registro actualizado con exito" });
+      .json({ error: false, msg: "Registro actualizado con éxito" });
 
   } catch (error) {
     res.status(400).json({ error: true, details: error });
@@ -1031,7 +1031,7 @@ app.put("/setPass", async (req, res) => {
 
     res
       .status(200)
-      .json({ error: false, msg: "Registro actualizado con exito" });
+      .json({ error: false, msg: "Contraseña actualizada con éxito" });
   } catch (error) {
     res.status(400).json({ error: true, details: error });
   }
@@ -1083,7 +1083,7 @@ app.put("/setCity", async (req, res) => {
 
     res
       .status(200)
-      .json({ error: false, msg: "Registro actualizado con exito" });
+      .json({ error: false, msg: "Registro actualizado con éxito" });
 
   } catch (error) {
     res.status(400).json({ error: true, details: error });
