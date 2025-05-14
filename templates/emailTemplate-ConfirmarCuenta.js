@@ -13,7 +13,7 @@ module.exports = function generarEmail(nombre, token) {
               <table width="600" cellpadding="20" cellspacing="0" border="0" style="background-color: #ffffff;">
                 <tr>
                   <td align="center">
-                    <img src="https://max-tickets.s3.us-east-2.amazonaws.com/imagenes_correos/mail_header.png" alt="header" width="100%" style="max-width:600px;" />
+                    <img src="https://max-tickets.s3.us-east-2.amazonaws.com/imagenes_correos/mail_header.png" alt="No olvides autorizar este correo a tu lista de deseados" width="100%" style="max-width:600px;" />
                   </td>
                 </tr>
                 <tr>
@@ -23,11 +23,11 @@ module.exports = function generarEmail(nombre, token) {
                       Ya falta poco para que puedas participar en la dinámica del 55 Aniversario de Tintorerías MAX.
                     </p>
                     <p style="font-size:16px; color:#004d40;">
-                      Por favor, confirma tu correo electrónico dando click en el siguiente enlace e inicia sesión, al confimar tu correo y registrar una compra, podrás contestar una trivia por cada registro y acumular puntos.
+                      Por favor, confirma tu dirección de correo electrónico haciendo clic en el siguiente enlace e inicia sesión. Al confirmar tu correo y registrar una compra, podrás contestar una trivia por cada registro y acumular puntos.
                     </p>
                     <p>
-                      <a href="http://maxaniversario.com/verified.html?token=${token}" style="color:#004d40; font-weight: bold;">
-                        http://maxaniversario.com/verified.html?token=${token}
+                      <a href="https://maxaniversario.com/verified.html?token=${token}" style="color:#004d40; font-weight: bold;">
+                        Confirmar mi cuenta
                       </a>
                     </p>
                     <p style="font-size:16px; color:#004d40;">

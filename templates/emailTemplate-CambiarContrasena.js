@@ -13,7 +13,7 @@ module.exports = function generarEmail(nombre, contrasena) {
               <table width="600" cellpadding="20" cellspacing="0" border="0" style="background-color: #ffffff;">
                 <tr>
                   <td align="center">
-                    <img src="https://max-tickets.s3.us-east-2.amazonaws.com/imagenes_correos/mail_header.png" alt="header" width="100%" style="max-width:600px;" />
+                    <img src="https://max-tickets.s3.us-east-2.amazonaws.com/imagenes_correos/mail_header.png" alt="No olvides autorizar este correo a tu lista de deseados" width="100%" style="max-width:600px;" />
                   </td>
                 </tr>
                 <tr>
