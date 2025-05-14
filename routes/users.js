@@ -537,6 +537,11 @@ app.post("/resetpass", async (req, res) => {
       return res.status(400).json({ error: true, msg: `Lo sentimos, el correo ${email} fué dado de baja.` });
     }
 
+    if (user.tipo_usur == 'Colaborador') {
+      return res.status(400).json({ error: true, msg: `Lo sentimos, los colaboradores no pueden modificar su contraseña, favor de contactar a mercadotecnia@tintoreriasmax.com`});
+    }
+
+
     let newpass = Math.random().toString(36).substring(0, 5);
 
 
