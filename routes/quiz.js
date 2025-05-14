@@ -30,7 +30,7 @@ app.get("/quiz/:idTrivia/:idUser", async (req, res) => {
     query = `SELECT preguntas.id_pregunta, preguntas.opcion_1_preg, preguntas.opcion_2_preg, preguntas.opcion_3_preg, preguntas.pregunta FROM preguntas 
     WHERE id_pregunta = ?
     AND id_pregunta NOT IN (
-        SELECT id_preg_resp FROM respuestas WHERE id_usuario_resp = ?
+        SELECT id_preg_resp FROM respuestas WHERE id_usuario_resp = ? AND tipo_preg_resp = 'general'
     ) 
     LIMIT 1
     `;
@@ -43,7 +43,7 @@ app.get("/quiz/:idTrivia/:idUser", async (req, res) => {
       query = `SELECT preguntas.id_pregunta, preguntas.opcion_1_preg, preguntas.opcion_2_preg, preguntas.opcion_3_preg, preguntas.pregunta FROM preguntas 
       WHERE id_pregunta = ?
       AND id_pregunta NOT IN (
-        SELECT id_preg_resp FROM respuestas WHERE id_usuario_resp = ?
+        SELECT id_preg_resp FROM respuestas WHERE id_usuario_resp = ? AND tipo_preg_resp = 'general'
       ) 
       LIMIT 1
       `;
