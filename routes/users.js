@@ -131,8 +131,8 @@ app.post("/crear", async (req, res) => {
     }
 
     //Verificamos no exista el correo en la DB
-    let query = `SELECT * FROM usuarios WHERE correo_usur = '${correo_usur}'`;
-    let existCorreo = await db.pool.query(query);
+    let query = `SELECT * FROM usuarios WHERE correo_usur = ?`;
+    let existCorreo = await db.pool.query(query, [correo_usur]);
 
     if (existCorreo[0].length >= 1) {
       return res.status(400).json({
@@ -142,8 +142,8 @@ app.post("/crear", async (req, res) => {
     }
 
     //Verificamos no exista el telefono en la DB
-    let query2 = `SELECT * FROM usuarios WHERE tel_usur = '${tel_usur}'`;
-    let existTelefono = await db.pool.query(query2);
+    let query2 = `SELECT * FROM usuarios WHERE tel_usur = ?`;
+    let existTelefono = await db.pool.query(query2, [tel_usur]);
 
     if (existTelefono[0].length >= 1) {
       return res.status(400).json({
@@ -283,9 +283,8 @@ app.post("/login", async (req, res) => {
       });
     }
 
-    let query = `SELECT * FROM usuarios WHERE correo_usur = '${email}'`;
-
-    let user = await db.pool.query(query);
+    let query = `SELECT * FROM usuarios WHERE correo_usur = ?`;
+    let user = await db.pool.query(query, [email]);
 
     user = user[0];
 
@@ -396,9 +395,8 @@ app.post("/loginAdmin", async (req, res) => {
       });
     }
 
-    let query = `SELECT * FROM usuarios WHERE correo_usur = '${email}' AND estatus_usur != 'cancelado'`;
-
-    let user = await db.pool.query(query);
+    let query = `SELECT * FROM usuarios WHERE correo_usur = ? AND estatus_usur != 'cancelado'`;
+    let user = await db.pool.query(query, [email]);
 
     user = user[0];
 
@@ -478,13 +476,8 @@ app.post("/desactivar", async (req, res) => {
     let fecha = date + " " + time;
     let query = ``;
 
-    query = `UPDATE usuarios SET
-						estatus_usur = 'cancelado', 
-						updated_at  = '${fecha}'
-	  				WHERE id_usuario = ${userId}`;
-
-
-    let result = await db.pool.query(query);
+    query = `UPDATE usuarios SET estatus_usur = 'cancelado', updated_at  = ? WHERE id_usuario = ?`;
+    let result = await db.pool.query(query, [fecha, userId]);
     result = result[0];
 
     res
@@ -521,9 +514,8 @@ app.post("/resetpass", async (req, res) => {
       today.getHours() + ":" + today.getMinutes() + ":" + today.getSeconds();
     let fecha = date + " " + time;
 
-    let query = `SELECT * FROM usuarios WHERE correo_usur ='${email}'`;
-
-    let user = await db.pool.query(query);
+    let query = `SELECT * FROM usuarios WHERE correo_usur = ?`;
+    let user = await db.pool.query(query, [email]);
 
     user = user[0];
 
@@ -538,7 +530,7 @@ app.post("/resetpass", async (req, res) => {
     }
 
     if (user.tipo_usur == 'Colaborador') {
-      return res.status(400).json({ error: true, msg: `Lo sentimos, los colaboradores no pueden modificar su contraseña, favor de contactar a mercadotecnia@tintoreriasmax.com`});
+      return res.status(400).json({ error: true, msg: `Lo sentimos, los colaboradores no pueden modificar su contraseña, favor de contactar a mercadotecnia@tintoreriasmax.com` });
     }
 
 
@@ -568,6 +560,7 @@ app.post("/resetpass", async (req, res) => {
     res
       .status(200)
       .json({ error: false, msg: "Se ha enviado el correo electronico" });
+
   } catch (error) {
     console.log(error);
     res.status(500).json({
@@ -591,9 +584,9 @@ app.get("/obtener/:id", async (req, res) => {
 
     let query = `SELECT id_usuario, nombre_usur, correo_usur, tel_usur, ciudad_usur, forma_usur, acumulado_usur, aviso_usur, term_usur, tipo_usur, estatus_usur  
 						FROM usuarios 
-						WHERE id_usuario = ${userId}`;
+						WHERE id_usuario = ?`;
+    let user = await db.pool.query(query, [userId]);
 
-    let user = await db.pool.query(query);
     //console.log(user[0]);
     user = user[0];
 
@@ -807,29 +800,53 @@ app.put("/set", async (req, res) => {
       const salt = await bcryptjs.genSalt(10);
       const hashedPassword = await bcryptjs.hash(pass, salt);
 
-      query = `UPDATE usuario  SET
-	  					nombre_usur = '${nombre_usur}', 
-      					correo_usur = '${correo_usur}', 
-      					tel_usur    = '${tel_usur}', 
-      					ciudad_usur = '${ciudad_usur}', 
-      					forma_usur  = '${forma_usur}', 
-      					pass        = '${hashedPassword}', 
-      					tipo_usur   = '${tipo_usur}'
-                        updated_at  = '${fecha}'
-                        WHERE id_usuario = ${id}`;
+      query = `UPDATE usuario SET
+            nombre_usur = ?, 
+            correo_usur = ?, 
+            tel_usur = ?, 
+            ciudad_usur = ?, 
+            forma_usur = ?, 
+            pass = ?, 
+            tipo_usur = ?, 
+            updated_at = ?
+          WHERE id_usuario = ?`;
+
+      values = [
+        nombre_usur,
+        correo_usur,
+        tel_usur,
+        ciudad_usur,
+        forma_usur,
+        hashedPassword,
+        tipo_usur,
+        fecha,
+        id
+      ];
     } else {
-      query = `UPDATE usuario  SET
-						nombre_usur = '${nombre_usur}', 
-						correo_usur = '${correo_usur}', 
-						tel_usur    = '${tel_usur}', 
-						ciudad_usur = '${ciudad_usur}', 
-						forma_usur  = '${forma_usur}', 
-						tipo_usur   = '${tipo_usur}'
-	  					updated_at  = '${fecha}'
-	  					WHERE id_usuario = ${id}`;
+      query = `UPDATE usuario SET
+            nombre_usur = ?, 
+            correo_usur = ?, 
+            tel_usur = ?, 
+            ciudad_usur = ?, 
+            forma_usur = ?, 
+            tipo_usur = ?, 
+            updated_at = ?
+          WHERE id_usuario = ?`;
+
+      values = [
+        nombre_usur,
+        correo_usur,
+        tel_usur,
+        ciudad_usur,
+        forma_usur,
+        tipo_usur,
+        fecha,
+        id
+      ];
     }
 
-    let result = await db.pool.query(query);
+    let result = await db.pool.query(query, values);
+
     result = result[0];
 
     const payload = {
@@ -883,12 +900,13 @@ app.put("/setName", async (req, res) => {
     let query = ``;
 
     query = `UPDATE usuarios SET
-						nombre_usur = '${nombre_usur}', 
-						updated_at  = '${fecha}'
-	  				WHERE id_usuario = ${id}`;
+            nombre_usur = ?, 
+            updated_at = ?
+         WHERE id_usuario = ?`;
 
+    let values = [nombre_usur, fecha, id];
 
-    let result = await db.pool.query(query);
+    let result = await db.pool.query(query, values);
     result = result[0];
 
     res
@@ -923,9 +941,10 @@ app.put("/setPhone", async (req, res) => {
       });
     }
 
-    //Verificamos no exista el telefono en la DB
-    let query2 = `SELECT * FROM usuarios WHERE tel_usur = '${tel_usur}' AND id_usuario != '${id}'`;
-    let existTelefono = await db.pool.query(query2);
+    let query2 = `SELECT * FROM usuarios WHERE tel_usur = ? AND id_usuario != ?`;
+    let values = [tel_usur, id];
+
+    let existTelefono = await db.pool.query(query2, values);
 
     if (existTelefono[0].length >= 1) {
       return res.status(400).json({
@@ -947,12 +966,14 @@ app.put("/setPhone", async (req, res) => {
     let query = ``;
 
 
-    query = `UPDATE usuarios  SET
-						tel_usur    = '${tel_usur}', 
-	  				updated_at  = '${fecha}'
-	  				WHERE id_usuario = ${id}`;
+    query = `UPDATE usuarios SET
+            tel_usur = ?, 
+            updated_at = ?
+         WHERE id_usuario = ?`;
 
-    let result = await db.pool.query(query);
+    let values2 = [tel_usur, fecha, id];
+
+    let result = await db.pool.query(query, values2);
     result = result[0];
 
     res
@@ -993,8 +1014,8 @@ app.put("/setPass", async (req, res) => {
       });
     }
 
-    let query2 = `SELECT * FROM usuarios WHERE id_usuario = '${id}'`;
-    let user = await db.pool.query(query2);
+    let query2 = `SELECT * FROM usuarios WHERE id_usuario = ?`;
+    let user = await db.pool.query(query2, [id]);
     user = user[0];
 
     if (user.length === 0) {
@@ -1024,13 +1045,14 @@ app.put("/setPass", async (req, res) => {
     const salt = await bcryptjs.genSalt(10);
     const hashedPassword = await bcryptjs.hash(pass, salt);
 
-    query = `UPDATE usuarios  SET
-	    			 pass        = '${hashedPassword}', 
-             updated_at  = '${fecha}'
-             WHERE id_usuario = ${id}`;
+    query = `UPDATE usuarios SET
+            pass = ?, 
+            updated_at = ?
+         WHERE id_usuario = ?`;
 
+    let values = [hashedPassword, fecha, id];
 
-    let result = await db.pool.query(query);
+    let result = await db.pool.query(query, values);
     result = result[0];
 
 
@@ -1078,12 +1100,14 @@ app.put("/setCity", async (req, res) => {
     let fecha = date + " " + time;
     let query = ``;
 
-    query = `UPDATE usuarios  SET
-						ciudad_usur    = '${ciudad_usur}', 
-	  				updated_at  = '${fecha}'
-	  				WHERE id_usuario = ${id}`;
+    query = `UPDATE usuarios SET
+            ciudad_usur = ?, 
+            updated_at = ?
+         WHERE id_usuario = ?`;
 
-    let result = await db.pool.query(query);
+    let values = [ciudad_usur, fecha, id];
+
+    let result = await db.pool.query(query, values);
     result = result[0];
 
     res
@@ -1117,12 +1141,14 @@ app.put("/delete", async (req, res) => {
       today.getHours() + ":" + today.getMinutes() + ":" + today.getSeconds();
     let fecha = date + " " + time;
 
-    let query = `UPDATE usuarios  SET
-                        estatus     = 'cancelado',
-                        updated_at  = '${fecha}'
-                        WHERE id_usuario = ${userId}`;
+    let query = `UPDATE usuarios SET
+                estatus = ?, 
+                updated_at = ?
+             WHERE id_usuario = ?`;
 
-    let result = await db.pool.query(query);
+    let values = ['cancelado', fecha, userId];
+
+    let result = await db.pool.query(query, values);
     result = result[0];
 
     res
@@ -1720,12 +1746,13 @@ app.post('/save-token', async (req, res) => {
     let query = ``;
 
     query = `UPDATE usuarios SET
-						firebase_token = '${token}', 
-						updated_at  = '${fecha}'
-	  				WHERE id_usuario = ${userId}`;
+            firebase_token = ?, 
+            updated_at = ?
+         WHERE id_usuario = ?`;
 
+    let values = [token, fecha, userId];
 
-    let result = await db.pool.query(query);
+    let result = await db.pool.query(query, values);
     result = result[0];
 
     res

@@ -33,9 +33,8 @@ app.get("/obtener/:id", async (req, res) => {
       });
     }
 
-    let query = `SELECT * FROM sucursales WHERE idSucursal = ${storeId}`;
-
-    let store = await db.pool.query(query);
+    let query = `SELECT * FROM sucursales WHERE idSucursal = ?`;
+    let store = await db.pool.query(query,[storeId]);
 
     store = store[0];
 
