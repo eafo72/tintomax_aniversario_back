@@ -1657,57 +1657,59 @@ app.get("/rankPositionStore/:id/:idSucursal", async (req, res) => {
 
     let myPosition = await db.pool.query(query, [storeId, userId]);
 
-    if(myPosition.length == 0){
+    if (myPosition[0].length == 0) {
       return res.status(200).json({ error: false, myPositionStore: 0, upPositionStore: 0, downPositionStore: 0 });
+    } else {
+      myPosition = myPosition[0];
+      const myRanking = myPosition[0].ranking;
+
+      //one position up
+      query = `SELECT 
+      id_usuario,
+      nombre_usur,
+      acumulado_usur,
+      ranking
+      FROM (
+      SELECT 
+        id_usuario,
+        nombre_usur,
+        acumulado_usur,
+        ROW_NUMBER() OVER (ORDER BY acumulado_usur DESC) AS ranking
+      FROM usuarios
+      WHERE tipo_usur = 'Cliente' AND acumulado_usur IS NOT NULL AND id_sucursal = ?
+      ) AS subquery
+      WHERE ranking = ?`;
+
+      let rankAbove = myRanking - 1;
+      let upPosition = await db.pool.query(query, [storeId, rankAbove]);
+      upPosition = upPosition[0];
+
+      //one position down
+      query = `SELECT 
+      id_usuario,
+      nombre_usur,
+      acumulado_usur,
+      ranking
+      FROM (
+      SELECT 
+        id_usuario,
+        nombre_usur,
+        acumulado_usur,
+        ROW_NUMBER() OVER (ORDER BY acumulado_usur DESC) AS ranking
+      FROM usuarios
+      WHERE tipo_usur = 'Cliente' AND acumulado_usur IS NOT NULL AND id_sucursal = ?
+      ) AS subquery
+      WHERE ranking = ?`;
+
+      let rankBelow = myRanking + 1;
+      let downPosition = await db.pool.query(query, [storeId, rankBelow]);
+      downPosition = downPosition[0];
+
+
+      res.status(200).json({ error: false, myPositionStore: myPosition, upPositionStore: upPosition, downPositionStore: downPosition });
+
     }
-    myPosition = myPosition[0];
-    const myRanking = myPosition[0].ranking;
-
-    //one position up
-    query = `SELECT 
-    id_usuario,
-    nombre_usur,
-    acumulado_usur,
-    ranking
-    FROM (
-      SELECT 
-        id_usuario,
-        nombre_usur,
-        acumulado_usur,
-        ROW_NUMBER() OVER (ORDER BY acumulado_usur DESC) AS ranking
-      FROM usuarios
-      WHERE tipo_usur = 'Cliente' AND acumulado_usur IS NOT NULL AND id_sucursal = ?
-    ) AS subquery
-    WHERE ranking = ?`;
-
-    let rankAbove = myRanking - 1;
-    let upPosition = await db.pool.query(query, [storeId, rankAbove]);
-    upPosition = upPosition[0];
-
-    //one position down
-    query = `SELECT 
-    id_usuario,
-    nombre_usur,
-    acumulado_usur,
-    ranking
-    FROM (
-      SELECT 
-        id_usuario,
-        nombre_usur,
-        acumulado_usur,
-        ROW_NUMBER() OVER (ORDER BY acumulado_usur DESC) AS ranking
-      FROM usuarios
-      WHERE tipo_usur = 'Cliente' AND acumulado_usur IS NOT NULL AND id_sucursal = ?
-    ) AS subquery
-    WHERE ranking = ?`;
-
-    let rankBelow = myRanking + 1;
-    let downPosition = await db.pool.query(query, [storeId, rankBelow]);
-    downPosition = downPosition[0];
-
-
-    res.status(200).json({ error: false, myPositionStore: myPosition, upPositionStore: upPosition, downPositionStore: downPosition });
-
+    
   } catch (error) {
     res.status(500).json({
       msg: "Hubo un error obteniendo los datos",
