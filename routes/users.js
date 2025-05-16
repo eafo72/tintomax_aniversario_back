@@ -1768,6 +1768,56 @@ app.post('/save-token', async (req, res) => {
 });
 
 
+async function cronRanking() {
+  try {
+    let today = new Date();
+
+    // Formatear la fecha y hora con la zona horaria específica
+    let options = {
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit',
+      hour: '2-digit',
+      minute: '2-digit',
+      second: '2-digit',
+      hour12: false,
+      timeZone: 'America/Mexico_City', // Especificar la zona horaria
+    };
+
+    let fechaLocal = new Intl.DateTimeFormat('en-GB', options).format(today);
+
+    // Separar fecha y hora
+    let [date, time] = fechaLocal.split(', ');
+    let [day, month, year] = date.split('/');
+    let [hour, minute, second] = time.split(':');
+
+    // Crear la fecha con el formato correcto para SQL
+    let fecha = `${year}-${month}-${day} ${hour}:${minute}:${second}`;
+
+    //Actualizar el ranking
+    const updateRankingQuery = `
+      UPDATE usuarios 
+      JOIN (SELECT id_usuario, 
+         RANK() OVER (ORDER BY acumulado_usur DESC) AS nueva_posicion
+         FROM usuarios) AS ranking 
+         ON usuarios.id_usuario = ranking.id_usuario
+      SET usuarios.ranking_usur = ranking.nueva_posicion;
+    `;
+    await db.pool.query(updateRankingQuery);
+
+    const updateRankingTableQuery = `UPDATE ranking SET lastUpdated = '${fecha}' WHERE idRanking = 1`;
+    await db.pool.query(updateRankingTableQuery);
+
+
+    console.log("Cron job realizado");
+
+
+  } catch (error) {
+    console.log(error);
+    console.log("Cron job NO realizado");
+  }
+}
+
 //para probar hay que traer la funcion a este archivo
 app.get('/test-cron', async (req, res) => {
   try {
