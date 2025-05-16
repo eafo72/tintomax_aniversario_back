@@ -241,7 +241,7 @@ app.post("/crear", async (req, res) => {
 
     //enviamos correo para que confirme su cuenta
     let message = {
-      from: process.env.MAIL,
+      from: `"Max Tintorerías" <${process.env.MAIL}>`,
       to: correo_usur,
       subject: "Confirma tu cuenta",
       html: confirmarCuentaTemplate(nombre_usur, token), // Usas el nombre y el token aquí
@@ -538,7 +538,7 @@ app.post("/resetpass", async (req, res) => {
 
 
     let message = {
-      from: process.env.MAIL,
+      from: `"Max Tintorerías" <${process.env.MAIL}>`,
       to: email,
       subject: "Cambio de Contraseña",
       html: cambiarContrasenaTemplate(user.nombre_usur, newpass), // Usas el nombre y el token aquí
@@ -722,7 +722,7 @@ app.post("/reenviarCorreoConfirmacion", async (req, res) => {
 
     //enviamos correo para que confirme su cuenta
     let message = {
-      from: process.env.MAIL,
+      from: `"Max Tintorerías" <${process.env.MAIL}>`,
       to: correo_usur,
       subject: "Confirma tu cuenta",
       html: confirmarCuentaTemplate(nombre_usur, token), // Usas el nombre y el token aquí
@@ -1371,7 +1371,7 @@ app.post("/registrarTicket", upload.single("fotoTicket"), async (req, res) => {
     }
 
     let message = {
-      from: process.env.MAIL,
+      from: `"Max Tintorerías" <${process.env.MAIL}>`,
       to: correoUsur,
       subject: "Nuevo ticket registrado",
       html: compraRegistradaTemplate(nombreUsur, numeroNota, texto),
@@ -1709,7 +1709,7 @@ app.get("/rankPositionStore/:id/:idSucursal", async (req, res) => {
       res.status(200).json({ error: false, myPositionStore: myPosition, upPositionStore: upPosition, downPositionStore: downPosition });
 
     }
-    
+
   } catch (error) {
     res.status(500).json({
       msg: "Hubo un error obteniendo los datos",
