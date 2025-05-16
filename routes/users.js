@@ -1181,10 +1181,10 @@ app.post("/registrarTicket", upload.single("fotoTicket"), async (req, res) => {
 
   // Validaciones básicas
   if (
-    !numeroNota ||
-    !idUnidad ||
-    !cantidadPrendas ||
-    !total ||
+    !numeroNota || numeroNota == 0 || 
+    !idUnidad || idUnidad == 0 ||
+    !cantidadPrendas || cantidadPrendas == 0 ||
+    !total || total == 0 ||
     !fechaCompra ||
     !req.file
   ) {
