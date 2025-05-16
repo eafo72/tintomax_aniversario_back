@@ -71,6 +71,17 @@ app.get("/check/:idTrivia/:idUser/:idQuiz/:idAnswer/:numQuestion", async (req, r
       totalPuntos = puntosporrespuestacorrecta;
     }
 
+    //antes que nada revisamos si ya existe la respuesta
+    let query2 = `SELECT * FROM respuestas WHERE id_usuario_resp = ? AND id_preg_resp = ? AND tipo_preg_resp = ?`;
+    let existeRespuesta = await db.pool.query(query2, [id_usuario,id_pregunta,tipo_pregunta]);
+
+    if (existeRespuesta[0].length > 0) {
+      return res.status(400).json({
+        msg: "La respuesta ya existe, posible intento de fraude",
+        error: true,
+      });
+    }
+
     query = `INSERT INTO respuestas 
          (id_usuario_resp,
           id_preg_resp,
