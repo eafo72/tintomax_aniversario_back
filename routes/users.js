@@ -1656,6 +1656,10 @@ app.get("/rankPositionStore/:id/:idSucursal", async (req, res) => {
     // aca tulio pidio qu quitara ranking_usur is not null
 
     let myPosition = await db.pool.query(query, [storeId, userId]);
+
+    if(myPosition.length == 0){
+      return res.status(200).json({ error: false, myPositionStore: 0, upPositionStore: 0, downPositionStore: 0 });
+    }
     myPosition = myPosition[0];
     const myRanking = myPosition[0].ranking;
 
