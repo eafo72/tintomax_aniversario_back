@@ -1648,10 +1648,12 @@ app.get("/rankPositionStore/:id/:idSucursal", async (req, res) => {
         acumulado_usur,
         ROW_NUMBER() OVER (ORDER BY acumulado_usur DESC) AS ranking
       FROM usuarios
-      WHERE tipo_usur = 'Cliente' AND acumulado_usur IS NOT NULL AND ranking_usur IS NOT NULL AND id_sucursal = ?
+      WHERE tipo_usur = 'Cliente' AND acumulado_usur IS NOT NULL AND id_sucursal = ?
     ) AS subquery
     WHERE id_usuario = ?
     `;
+
+    // aca tulio pidio qu quitara ranking_usur is not null
 
     let myPosition = await db.pool.query(query, [storeId, userId]);
     myPosition = myPosition[0];
