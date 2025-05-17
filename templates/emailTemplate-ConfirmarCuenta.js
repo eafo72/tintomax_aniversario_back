@@ -23,16 +23,16 @@ module.exports = function generarEmail(nombre, token) {
                       Ya falta poco para que puedas participar en la dinámica del 55 Aniversario de Tintorerías MAX.
                     </p>
                     <p style="font-size:16px; color:#004d40;">
-                      Por favor, confirma tu dirección de correo electrónico haciendo clic en el siguiente enlace e inicia sesión. Al confirmar tu correo y registrar una compra, podrás contestar una trivia por cada registro y acumular puntos.
+                      Por favor, confirma tu dirección de correo electrónico en el siguiente enlace e inicia sesión. Al confirmar tu correo y registrar una compra, podrás contestar una trivia por cada registro y acumular puntos.
                     </p>
                     <p>
-                      <a href="https://maxaniversario.com/verified.html?token=${token}" style="color:#004d40; font-weight: bold;">
+                      <a href="https://maxaniversario.com/verified.html?token=${token}" style="color:#004d40; font-weight: bold; margin: 0 auto;">
                         Confirmar mi cuenta
                       </a>
                     </p>
                     <p style="font-size:16px; color:#004d40;">
-                      Premiamos tu lealtad, porque sin ti no habríamos llegado tan lejos. Gana viajes, un auto MG3, una moto Roya o descuentos de Tintorería con Max.
-                      Participa, contesta las trivias y acumula puntos.
+                      Premiamos tu lealtad, porque sin ti no habríamos llegado tan lejos. 
+                      Participa, contesta las trivias , acumula puntos y gana.
                     </p>
                     <p style="font-weight:bolder; color:#004d40; text-align:center;">
                       Gracias por confiar en nosotros todos estos años<br />
