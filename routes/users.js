@@ -1290,13 +1290,12 @@ app.post("/registrarTicket", upload.single("fotoTicket"), async (req, res) => {
       cat_trivia_comp,
       id_usuario_vend_comp
       ) 
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
+      VALUES (?, ?, ?, ?, NOW(), ?, ?, ?, ?, ?)`;
     const values = [
       numeroNota,
       idUnidad,
       cantidadPrendas,
       total,
-      now(),
       idCliente,
       imageUrl,
       fecha,
