@@ -1174,7 +1174,6 @@ app.post("/registrarTicket", upload.single("fotoTicket"), async (req, res) => {
     idUnidad,
     cantidadPrendas,
     total,
-    fechaCompra,
     idCliente,
     idVendedor,
   } = req.body;
@@ -1185,7 +1184,6 @@ app.post("/registrarTicket", upload.single("fotoTicket"), async (req, res) => {
     !idUnidad || idUnidad == 0 ||
     !cantidadPrendas || cantidadPrendas == 0 ||
     !total || total == 0 ||
-    !fechaCompra ||
     !req.file
   ) {
     return res
@@ -1298,7 +1296,7 @@ app.post("/registrarTicket", upload.single("fotoTicket"), async (req, res) => {
       idUnidad,
       cantidadPrendas,
       total,
-      fechaCompra,
+      now(),
       idCliente,
       imageUrl,
       fecha,
