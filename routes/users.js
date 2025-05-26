@@ -1512,7 +1512,7 @@ app.get("/rank5", async (req, res) => {
 		nombre_usur,
 		acumulado_usur,
     ranking_usur
-    FROM usuarios WHERE tipo_usur = 'Cliente' AND acumulado_usur IS NOT NULL AND ranking_usur IS NOT NULL  ORDER BY ranking_usur ASC LIMIT 5
+    FROM usuarios WHERE tipo_usur = 'Cliente' AND acumulado_usur IS NOT NULL AND ranking_usur IS NOT NULL AND estatus_usur != 'cancelado' ORDER BY ranking_usur ASC LIMIT 5
         `;
     let rank5 = await db.pool.query(query);
     rank5 = rank5[0];
@@ -1543,7 +1543,7 @@ app.get("/rank5Store/:id", async (req, res) => {
 		nombre_usur,
 		acumulado_usur,
     ranking_usur
-    FROM usuarios WHERE tipo_usur = 'Cliente' AND acumulado_usur IS NOT NULL AND ranking_usur IS NOT NULL AND id_sucursal = ? ORDER BY ranking_usur ASC LIMIT 5
+    FROM usuarios WHERE tipo_usur = 'Cliente' AND acumulado_usur IS NOT NULL AND ranking_usur IS NOT NULL AND estatus_usur != 'cancelado' AND id_sucursal = ? ORDER BY ranking_usur ASC LIMIT 5
         `;
     let rank5Store = await db.pool.query(query, [storeId]);
     rank5Store = rank5Store[0];
@@ -1798,13 +1798,16 @@ async function cronRanking() {
     let fecha = `${year}-${month}-${day} ${hour}:${minute}:${second}`;
 
     //Actualizar el ranking
-    const updateRankingQuery = `
-      UPDATE usuarios 
-      JOIN (SELECT id_usuario, 
-         RANK() OVER (ORDER BY acumulado_usur DESC) AS nueva_posicion
-         FROM usuarios) AS ranking 
-         ON usuarios.id_usuario = ranking.id_usuario
-      SET usuarios.ranking_usur = ranking.nueva_posicion;
+   const updateRankingQuery = `    
+    UPDATE usuarios 
+    JOIN (SELECT id_usuario, estatus_usur,
+        RANK() OVER (ORDER BY acumulado_usur DESC) AS nueva_posicion
+        FROM usuarios) AS ranking 
+        ON usuarios.id_usuario = ranking.id_usuario
+    SET usuarios.ranking_usur = CASE 
+        WHEN ranking.estatus_usur = 'cancelado' THEN NULL 
+        ELSE ranking.nueva_posicion 
+    END;
     `;
     await db.pool.query(updateRankingQuery);
 

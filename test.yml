@@ -2,7 +2,7 @@ config:
   target: 'https://api.maxaniversario.com' 
   phases:
     - duration: 60  # Duración de la prueba en segundos
-      arrivalRate: 100  # Número de usuarios virtuales por segundo
+      arrivalRate: 150  # Número de usuarios virtuales por segundo
       name: "Simulación de login"
 
 scenarios:

@@ -108,6 +108,7 @@ async function cronRanking() {
     let fecha = `${year}-${month}-${day} ${hour}:${minute}:${second}`;
 
     //Actualizar el ranking
+    /*
     const updateRankingQuery = `
       UPDATE usuarios 
       JOIN (SELECT id_usuario, 
@@ -116,6 +117,20 @@ async function cronRanking() {
          ON usuarios.id_usuario = ranking.id_usuario
       SET usuarios.ranking_usur = ranking.nueva_posicion;
     `;
+    */
+
+    const updateRankingQuery = `    
+    UPDATE usuarios 
+    JOIN (SELECT id_usuario, estatus_usur,
+        RANK() OVER (ORDER BY acumulado_usur DESC) AS nueva_posicion
+        FROM usuarios) AS ranking 
+        ON usuarios.id_usuario = ranking.id_usuario
+    SET usuarios.ranking_usur = CASE 
+        WHEN ranking.estatus_usur = 'cancelado' THEN NULL 
+        ELSE ranking.nueva_posicion 
+    END;
+    `;
+
     await db.pool.query(updateRankingQuery);
 
     const updateRankingTableQuery = `UPDATE ranking SET lastUpdated = '${fecha}' WHERE idRanking = 1`;
