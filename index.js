@@ -1,19 +1,26 @@
 const cron = require('node-cron');
 const express = require('express');
+const path = require('path');
+const helmet = require ('helmet');
 const cors = require('cors');
 
 const app = express();
-const userRoutes = require('./routes/users');
-const quizRoutes = require('./routes/quiz');
-const answerRoutes = require('./routes/answers');
-const storeRoutes = require('./routes/stores');
-const shopRoutes = require('./routes/shop');
-const rankingRoutes = require('./routes/ranking');
 
-require('dotenv').config();
+// 1) Middleware de seguridad general
+app.use(helmet());
 
-const db = require('./config/db');
+// 2) Parser de JSON / URL–encoded
+app.use(express.json({ limit: '25mb' }));
+app.use(express.urlencoded({ limit: '25mb', extended: true }));
 
+// 3) Denegar dotfiles en la carpeta pública
+app.use(
+  express.static(path.join(__dirname, 'public'), {
+    dotfiles: 'deny'   // rechaza /.env, /.gitignore, etc.
+  })
+);
+
+// 4) Aquí iría tu middleware de CORS (el que registra origin, etc.)
 //http://localhost:5173
 const allowedOrigins = [
   'https://maxaniversario.com',
@@ -51,8 +58,8 @@ app.use((req, res, next) => {
   next();
 });
 
-app.use(express.json({ limit: '25mb' }));
-app.use(express.urlencoded({ limit: '25mb', extended: true }));
+require('dotenv').config();
+const db = require('./config/db');
 
 const admin = require('firebase-admin');
 
@@ -168,6 +175,13 @@ cron.schedule("0 1 * * *", function () {
 });
 
 //rutas
+const userRoutes = require('./routes/users');
+const quizRoutes = require('./routes/quiz');
+const answerRoutes = require('./routes/answers');
+const storeRoutes = require('./routes/stores');
+const shopRoutes = require('./routes/shop');
+const rankingRoutes = require('./routes/ranking');
+
 app.use('/usuario', userRoutes);
 app.use('/preguntas', quizRoutes);
 app.use('/respuestas', answerRoutes);
