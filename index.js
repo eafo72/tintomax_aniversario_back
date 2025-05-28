@@ -23,9 +23,19 @@ const allowedOrigins = [
 
 app.use((req, res, next) => {
   const origin = req.headers.origin;
+  const userAgent = req.headers['user-agent'];
+
   if (allowedOrigins.includes(origin)) {
     res.header('Access-Control-Allow-Origin', origin);
+  }else{
+    console.warn('[⚠️ ORIGIN NO PERMITIDO]', {
+      metodo: req.method,
+      url: req.originalUrl,
+      origin,
+      userAgent,
+    });
   }
+
   res.header(
     'Access-Control-Allow-Headers',
     'Origin, X-Requested-With, Content-Type, Accept, Authorization'
