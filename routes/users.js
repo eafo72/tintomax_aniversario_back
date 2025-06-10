@@ -4,6 +4,7 @@ const app = express.Router();
 const bcryptjs = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const auth = require("../middlewares/authorization");
+const checkRole = require('../middleware/checkRole');
 const db = require("../config/db");
 const mailer = require("../controller/mailController");
 
@@ -54,8 +55,7 @@ const uploadToS3 = async (file) => {
 };
 
 
-
-app.get("/usuarios", async (req, res) => {
+app.get("/usuarios", auth, checkRole('ADMIN'), async (req, res) => {
   try {
     let query = `SELECT 
 		id_usuario,
@@ -316,6 +316,7 @@ app.post("/login", async (req, res) => {
         acumulado: user.acumulado_usur,
         ranking: user.ranking_usur,
         estatus: user.estatus_usur,
+        rol: user.tipo_usur
       },
     };
 
@@ -354,7 +355,7 @@ app.post("/login", async (req, res) => {
       jwt.sign(
         payload,
         process.env.SECRET,
-        { expiresIn: 3600000 },
+        { expiresIn: '1h'},
         (error, token) => {
           if (error) throw error;
 
@@ -422,6 +423,7 @@ app.post("/loginAdmin", async (req, res) => {
         nombre: user.nombre_usur,
         correo: user.correo_usur,
         estatus: user.estatus_usur,
+        rol: user.tipo_usur
       },
     };
 
@@ -430,7 +432,7 @@ app.post("/loginAdmin", async (req, res) => {
       jwt.sign(
         payload,
         process.env.SECRET,
-        { expiresIn: 3600000 },
+        { expiresIn: '1h' },
         (error, token) => {
           if (error) throw error;
           res.status(200).json({ error: false, token: token });
