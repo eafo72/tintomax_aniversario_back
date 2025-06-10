@@ -1,9 +1,11 @@
 /* Importing the express module and creating an instance of it. */
 const express = require("express");
 const app = express.Router();
+const auth = require("../middlewares/authorization");
+const checkRole = require('../middlewares/checkRole');
 const db = require("../config/db");
 
-app.get("/generales", async (req, res) => {
+app.get("/generales",auth, checkRole('Administrador'), async (req, res) => {
   try {
     let query = `SELECT * FROM compras c INNER JOIN usuarios u ON c.id_usuario_comp = u.id_usuario INNER JOIN sucursales s ON c.id_unidad_comp = s.idSucursal ORDER BY fecha_reg_comp DESC`;
     let compras = await db.pool.query(query);
@@ -68,7 +70,7 @@ ORDER BY c.fecha_comp`;
 
 
 
-app.get("/colaboradores", async (req, res) => {
+app.get("/colaboradores",auth, checkRole('Administrador'), async (req, res) => {
   try {
     let query = `SELECT 
     u.nombre_usur,

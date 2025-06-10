@@ -1,12 +1,14 @@
 /* Importing the express module and creating an instance of it. */
 const express = require("express");
 const app = express.Router();
+const auth = require("../middlewares/authorization");
+const checkRole = require('../middlewares/checkRole');
 const db = require("../config/db");
 const bodyParser = require("body-parser");
 
 app.use(bodyParser.json({ limit: "10mb" })); // Permitir imágenes grandes en base64
 
-app.get("/sucursales", async (req, res) => {
+app.get("/sucursales", auth, checkRole('Administrador', 'Cliente'), async (req, res) => {
   try {
     let query = `SELECT * FROM sucursales ORDER BY nombreSucursal ASC`;
     let sucursales = await db.pool.query(query);
@@ -22,7 +24,8 @@ app.get("/sucursales", async (req, res) => {
   }
 });
 
-app.get("/obtener/:id", async (req, res) => {
+
+app.get("/obtener/:id",auth, checkRole('Administrador'), async (req, res) => {
   try {
     let storeId = req.params.id;
 

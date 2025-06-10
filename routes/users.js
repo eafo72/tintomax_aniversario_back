@@ -573,7 +573,9 @@ app.post("/resetpass", async (req, res) => {
   }
 });
 
+/*
 app.get("/obtener/:id", async (req, res) => {
+  
   try {
     let userId = req.params.id;
 
@@ -601,6 +603,7 @@ app.get("/obtener/:id", async (req, res) => {
     });
   }
 });
+*/
 
 // VERIFICAR TOKEN
 app.post("/verificar", auth, async (req, res) => {
@@ -744,7 +747,7 @@ app.post("/reenviarCorreoConfirmacion", async (req, res) => {
   }
 });
 
-
+/*
 app.put("/set", async (req, res) => {
   try {
     let {
@@ -864,6 +867,7 @@ app.put("/set", async (req, res) => {
     res.status(400).json({ error: true, details: error });
   }
 });
+*/
 
 app.put("/setName", async (req, res) => {
   try {
@@ -1121,6 +1125,7 @@ app.put("/setCity", async (req, res) => {
   }
 });
 
+/*
 app.put("/delete", async (req, res) => {
   try {
     let userId = req.body.id;
@@ -1160,6 +1165,7 @@ app.put("/delete", async (req, res) => {
     res.status(400).json({ error: true, details: error });
   }
 });
+*/
 
 app.post("/registrarTicket", upload.single("fotoTicket"), async (req, res) => {
 
