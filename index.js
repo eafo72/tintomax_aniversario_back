@@ -2,7 +2,9 @@ const cron = require('node-cron');
 const express = require('express');
 const path = require('path');
 const helmet = require ('helmet');
-const rateLimit = require('express-rate-limit');
+const verificarIPBloqueada = require('./middlewares/verificarIPBloqueada');
+const customRateLimit = require('./middlewares/customRateLimit');
+
 const cors = require('cors');
 
 const app = express();
@@ -11,14 +13,10 @@ const app = express();
 app.use(helmet());
 
 // 1.1) Rate Limiting: protege de abusos (100 peticiones cada 15 minutos por IP)
-const limiter = rateLimit({
-  windowMs: 15 * 60 * 1000,
-  max: 100,
-  message: {
-    error: 'Demasiadas solicitudes desde esta IP, intenta más tarde.'
-  }
-});
-app.use(limiter);
+app.set('trust proxy', '127.0.0.1'); // muy importante si usas proxy inverso sino devolvera la misma ip siempre desde nginx ojo la ip es la nginx
+app.use(verificarIPBloqueada);
+app.use(customRateLimit);
+
 
 // 2) Parser de JSON / URL–encoded
 app.use(express.json({ limit: '25mb' }));
@@ -30,6 +28,30 @@ app.use(
     dotfiles: 'deny'   // rechaza /.env, /.gitignore, etc.
   })
 );
+
+// 3.1 Bloqueo por User-Agent sospechoso
+const blockedAgents = [
+  'postmanruntime',
+  'curl',
+  'insomnia',
+  'httpie',
+  'python-requests',
+  'axios',
+];
+
+app.use((req, res, next) => {
+  const userAgent = req.headers['user-agent']?.toLowerCase() || '';
+  if (blockedAgents.some(agent => userAgent.includes(agent))) {
+    console.warn('[❌ USER-AGENT BLOQUEADO]', {
+      metodo: req.method,
+      url: req.originalUrl,
+      userAgent,
+    });
+    return res.status(403).json({ error: 'User-Agent bloqueado' });
+  }
+  next();
+});
+
 
 // 4) Aquí iría tu middleware de CORS (el que registra origin, etc.)
 //http://localhost:5173
