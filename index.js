@@ -44,6 +44,8 @@ app.use((req, res, next) => {
       origin,
       userAgent,
     });
+    // Bloquea la solicitud con un error 403 (Forbidden)
+    return res.status(403).json({ error: 'Origen no permitido' });
   }
 
   res.header(
