@@ -4,7 +4,7 @@ const app = express.Router();
 const bcryptjs = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const auth = require("../middlewares/authorization");
-const checkRole = require('../middleware/checkRole');
+const checkRole = require('../middlewares/checkRole');
 const db = require("../config/db");
 const mailer = require("../controller/mailController");
 
