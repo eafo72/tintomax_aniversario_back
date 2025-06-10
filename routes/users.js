@@ -55,7 +55,7 @@ const uploadToS3 = async (file) => {
 };
 
 
-app.get("/usuarios", auth, checkRole('ADMIN'), async (req, res) => {
+app.get("/usuarios", auth, checkRole('Administrador'), async (req, res) => {
   try {
     let query = `SELECT 
 		id_usuario,
