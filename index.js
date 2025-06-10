@@ -2,12 +2,23 @@ const cron = require('node-cron');
 const express = require('express');
 const path = require('path');
 const helmet = require ('helmet');
+const rateLimit = require('express-rate-limit');
 const cors = require('cors');
 
 const app = express();
 
 // 1) Middleware de seguridad general
 app.use(helmet());
+
+// 1.1) Rate Limiting: protege de abusos (100 peticiones cada 15 minutos por IP)
+const limiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 100,
+  message: {
+    error: 'Demasiadas solicitudes desde esta IP, intenta más tarde.'
+  }
+});
+app.use(limiter);
 
 // 2) Parser de JSON / URL–encoded
 app.use(express.json({ limit: '25mb' }));
