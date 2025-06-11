@@ -1354,12 +1354,12 @@ app.post("/registrarTicket",auth, checkRole('Colaborador'), upload.single("fotoT
       }
 
     }
+    res
+      .status(200)
+      .json({ error: false, msg: "Ticket registrado con éxito" });
 
   } catch (error) {
-    console.error("Error guardando datos:", error);
-    res
-      .status(500)
-      .json({ error: true, msg: "Error guardando datos" });
+    res.status(400).json({ error: true, details: error });
   }
 
 
