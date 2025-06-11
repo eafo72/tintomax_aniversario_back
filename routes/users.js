@@ -350,12 +350,13 @@ app.post("/login", async (req, res) => {
 
     }
 
-    //firma del jwt  3600000 = 1hora
+    const expiracion = user.tipo_usur === 'Colaborador' ? '8h' : '1h';
+
     if (email && passCorrecto) {
       jwt.sign(
         payload,
         process.env.SECRET,
-        { expiresIn: '1h'},
+        { expiresIn: expiracion},
         (error, token) => {
           if (error) throw error;
 

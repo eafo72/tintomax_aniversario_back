@@ -3,7 +3,7 @@ const db = require("../config/db");
 
 const customLimiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutos
-  max: 100, // Máx 100 peticiones por IP
+  max: 200, // Máx 200 peticiones por IP
   handler: async (req, res, next) => {
     const ip = req.ip;
     const bloqueadoHasta = new Date(Date.now() + 60 * 60 * 1000); // 1 hora
