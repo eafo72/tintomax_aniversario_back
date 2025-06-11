@@ -448,7 +448,7 @@ app.post("/loginAdmin", async (req, res) => {
   }
 });
 
-app.post("/desactivar", async (req, res) => {
+app.post("/desactivar",auth, checkRole('Cliente'), async (req, res) => {
   try {
 
     const { userId } = req.body;
@@ -495,7 +495,7 @@ app.post("/desactivar", async (req, res) => {
   }
 });
 
-app.post("/resetpass", async (req, res) => {
+app.post("/resetpass",auth, checkRole('Cliente'), async (req, res) => {
   try {
     const { email } = req.body;
 
@@ -691,7 +691,7 @@ app.post("/verifyAccount", auth, async (req, res) => {
 });
 
 
-app.post("/reenviarCorreoConfirmacion", async (req, res) => {
+app.post("/reenviarCorreoConfirmacion",auth, checkRole('Cliente'), async (req, res) => {
 
   const { userId } = req.body;
 
@@ -870,7 +870,7 @@ app.put("/set", async (req, res) => {
 });
 */
 
-app.put("/setName", async (req, res) => {
+app.put("/setName",auth, checkRole('Cliente'), async (req, res) => {
   try {
     let {
       id,
@@ -924,7 +924,7 @@ app.put("/setName", async (req, res) => {
   }
 });
 
-app.put("/setPhone", async (req, res) => {
+app.put("/setPhone",auth, checkRole('Cliente'), async (req, res) => {
   try {
     let {
       id,
@@ -992,7 +992,7 @@ app.put("/setPhone", async (req, res) => {
   }
 });
 
-app.put("/setPass", async (req, res) => {
+app.put("/setPass",auth, checkRole('Cliente'), async (req, res) => {
   try {
     let {
       id,
@@ -1071,7 +1071,7 @@ app.put("/setPass", async (req, res) => {
   }
 });
 
-app.put("/setCity", async (req, res) => {
+app.put("/setCity",auth, checkRole('Cliente'), async (req, res) => {
   try {
     let {
       id,
@@ -1479,7 +1479,7 @@ app.post("/registrarTicket", upload.single("fotoTicket"), async (req, res) => {
   }
 });
 
-app.get("/trivias/:id", async (req, res) => {
+app.get("/trivias/:id",auth, checkRole('Cliente'), async (req, res) => {
   let userId = req.params.id;
 
   if (!userId) {
@@ -1725,7 +1725,7 @@ app.get("/rankPositionStore/:id/:idSucursal", async (req, res) => {
   }
 });
 
-app.post('/save-token', async (req, res) => {
+app.post('/save-token', auth, checkRole('Cliente'), async (req, res) => {
   try {
     const token = req.body.token;  // Recibe el token del cliente
     const userId = req.body.userId; // ID del usuario (si lo necesitas)
