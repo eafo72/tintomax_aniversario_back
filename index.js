@@ -2,7 +2,7 @@ const cron = require('node-cron');
 const express = require('express');
 const path = require('path');
 const helmet = require ('helmet');
-const verificarIPBloqueada = require('./middlewares/verificarIPBloqueada');
+//const verificarIPBloqueada = require('./middlewares/verificarIPBloqueada');
 const customRateLimit = require('./middlewares/customRateLimit');
 
 const cors = require('cors');
@@ -14,7 +14,7 @@ app.use(helmet());
 
 // 1.1) Rate Limiting: protege de abusos (100 peticiones cada 15 minutos por IP)
 app.set('trust proxy', '127.0.0.1'); // muy importante si usas proxy inverso sino devolvera la misma ip siempre desde nginx ojo la ip es la nginx
-app.use(verificarIPBloqueada);
+//app.use(verificarIPBloqueada); lo quite pq implica que se ejecute en cada peticion al servidor 
 app.use(customRateLimit);
 
 
