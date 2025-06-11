@@ -6,6 +6,7 @@ module.exports = (req, res, next) => {
 
   if (!token) {
     return res.status(401).json({
+      error: true,
       msg: "No hay token, permiso no válido",
     });
   }
