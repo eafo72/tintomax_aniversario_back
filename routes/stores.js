@@ -8,7 +8,7 @@ const bodyParser = require("body-parser");
 
 app.use(bodyParser.json({ limit: "10mb" })); // Permitir imágenes grandes en base64
 
-app.get("/sucursales", auth, checkRole('Administrador', 'Cliente'), async (req, res) => {
+app.get("/sucursales", async (req, res) => {
   try {
     let query = `SELECT * FROM sucursales ORDER BY nombreSucursal ASC`;
     let sucursales = await db.pool.query(query);
