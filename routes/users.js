@@ -1354,9 +1354,11 @@ app.post("/registrarTicket",auth, checkRole('Colaborador'), upload.single("fotoT
       }
 
     }
+    /*
     res
       .status(200)
       .json({ error: false, msg: "Ticket registrado con éxito" });
+      */
 
   } catch (error) {
     res.status(400).json({ error: true, details: error });
