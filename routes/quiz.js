@@ -1,10 +1,12 @@
 /* Importing the express module and creating an instance of it. */
 const express = require("express");
 const app = express.Router();
+const auth = require("../middlewares/authorization");
+const checkRole = require('../middlewares/checkRole');
 const db = require("../config/db");
 
 //preguntas por id trivia y id_usuario
-app.get("/quiz/:idTrivia/:idUser", async (req, res) => {
+app.get("/quiz/:idTrivia/:idUser",auth, checkRole('Cliente'), async (req, res) => {
   let id_trivia = req.params.idTrivia;
   let id_usuario = req.params.idUser;
 
@@ -108,7 +110,7 @@ app.get("/quiz/:idTrivia/:idUser", async (req, res) => {
 
 });
 
-app.get("/result/:idTrivia/:idUser", async (req, res) => {
+app.get("/result/:idTrivia/:idUser",auth, checkRole('Cliente'), async (req, res) => {
   let id_trivia = req.params.idTrivia;
   let id_usuario = req.params.idUser;
 
