@@ -1168,7 +1168,7 @@ app.put("/delete", async (req, res) => {
 });
 */
 
-app.post("/registrarTicket", upload.single("fotoTicket"), async (req, res) => {
+app.post("/registrarTicket",auth, checkRole('Colaborador'), upload.single("fotoTicket"), async (req, res) => {
 
   let firebase_token = null;
   let ultima_trivia = 0;
