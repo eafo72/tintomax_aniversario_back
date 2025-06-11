@@ -21,7 +21,7 @@ app.get("/generales",auth, checkRole('Administrador'), async (req, res) => {
   }
 });
 
-app.get("/tickets/:id", async (req, res) => {
+app.get("/tickets/:id",auth, checkRole('Cliente'), async (req, res) => {
   let userId = req.params.id;
 
   if (!userId) {
