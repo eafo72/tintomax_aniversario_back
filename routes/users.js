@@ -196,10 +196,12 @@ app.post("/crear", async (req, res) => {
     ];
 
     let result = await db.pool.query(query, values);
+    const insertedId = result.insertId;
     result = result[0];
 
     //CREAR TRIVIAS
     // Obtener todas las preguntas necesarias antes de insertarlas
+    /*
     const [preguntasGenerales] = await db.pool.query(
       "SELECT id_pregunta FROM preguntas ORDER BY RAND() LIMIT 100"
     );
@@ -210,12 +212,42 @@ app.post("/crear", async (req, res) => {
     if (preguntasGenerales.length < 100 || preguntasMax.length < 50) {
       throw new Error("No hay suficientes preguntas en la base de datos.");
     }
+    */ 
 
+    const [preguntasGenerales] = await db.pool.query(
+      `SELECT p.id_pregunta
+        FROM preguntas p
+        LEFT JOIN conjunto_triv ct1 
+        ON p.id_pregunta = ct1.id_preg1_conj AND ct1.id_user_conj = ?
+        LEFT JOIN conjunto_triv ct2 
+        ON p.id_pregunta = ct2.id_preg2_conj AND ct2.id_user_conj = ?
+        WHERE ct1.id_preg1_conj IS NULL AND ct2.id_preg2_conj IS NULL
+        ORDER BY RAND()
+        LIMIT 20`,
+      [insertedId, insertedId]
+    );
+
+    const [preguntasMax] = await db.pool.query(
+      `SELECT p.id_pregunta_max
+        FROM preguntas_max p
+        LEFT JOIN conjunto_triv ct1 
+        ON p.id_pregunta_max = ct1.id_preg3_conj AND ct1.id_user_conj = ?
+        WHERE ct1.id_preg3_conj IS NULL
+        ORDER BY RAND()
+        LIMIT 10`,
+      [insertedId]
+    );
+
+
+    if (preguntasGenerales.length < 20 || preguntasMax.length < 10) {
+      throw new Error("No hay suficientes preguntas en la base de datos.");
+    }
+ 
     const query3 =
       "INSERT INTO conjunto_triv (id_user_conj, id_preg1_conj, id_preg2_conj, id_preg3_conj, num_trivia, estatus_conj) VALUES (?, ?, ?, ?, ?, ?)";
 
-    // Insertar 50 trivias asegurando que cada una tiene preguntas únicas
-    for (let i = 0; i < 50; i++) {
+    // Insertar 10 trivias asegurando que cada una tiene preguntas únicas
+    for (let i = 0; i < 10; i++) {
       const pregunta_1 = preguntasGenerales.shift().id_pregunta;
       const pregunta_2 = preguntasGenerales.shift().id_pregunta;
       const pregunta_3 = preguntasMax.shift().id_pregunta_max;
@@ -237,7 +269,7 @@ app.post("/crear", async (req, res) => {
       },
     };
 
-    const token = jwt.sign(payload, process.env.SECRET, { expiresIn: "60d" });
+    const token = jwt.sign(payload, process.env.SECRET, { expiresIn: "2d" });
 
     //enviamos correo para que confirme su cuenta
     let message = {
@@ -1264,10 +1296,10 @@ app.post("/registrarTicket",auth, checkRole('Colaborador'), upload.single("fotoT
     let trivia = 0;
     let puntos = 0;
 
-    if (total >= 80 && total <= 239) {
+    if (total >= 80 && total < 240) {
       trivia = 1;
       puntos = 1;
-    } else if (total >= 240 && total <= 399) {
+    } else if (total >= 240 && total < 400) {
       trivia = 2;
       puntos = 3;
     } else if (total >= 400) {
@@ -1319,7 +1351,7 @@ app.post("/registrarTicket",auth, checkRole('Colaborador'), upload.single("fotoT
 
     //solo agrega trivia si puntos > 0
     if (puntos > 0) {
-      //buscamos la ultima trivia del usuario
+      //buscamos la ultima trivia del usuario para saber cual vamos a asignar
       const [rows] = await db.pool.query(
         `SELECT num_trivia FROM conjunto_triv WHERE id_user_conj = ? AND (estatus_conj = 'asignada' OR estatus_conj = 'contestada') ORDER BY num_trivia DESC LIMIT 1`,
         [idCliente]
@@ -1330,6 +1362,63 @@ app.post("/registrarTicket",auth, checkRole('Colaborador'), upload.single("fotoT
       }
 
       trivia_nueva = Number(ultima_trivia) + 1;
+
+      //si es 21, 31, 41 crear 10 nuevas trivias 
+      if (trivia_nueva == 11 || trivia_nueva == 21 || trivia_nueva == 31 || trivia_nueva == 41) {
+
+        const [preguntasGenerales] = await db.pool.query(
+          `SELECT p.id_pregunta
+        FROM preguntas p
+        LEFT JOIN conjunto_triv ct1 
+        ON p.id_pregunta = ct1.id_preg1_conj AND ct1.id_user_conj = ?
+        LEFT JOIN conjunto_triv ct2 
+        ON p.id_pregunta = ct2.id_preg2_conj AND ct2.id_user_conj = ?
+        WHERE ct1.id_preg1_conj IS NULL AND ct2.id_preg2_conj IS NULL
+        ORDER BY RAND()
+        LIMIT 20`,
+          [idCliente, idCliente]
+        );
+
+        const [preguntasMax] = await db.pool.query(
+          `SELECT p.id_pregunta_max
+        FROM preguntas_max p
+        LEFT JOIN conjunto_triv ct1 
+        ON p.id_pregunta_max = ct1.id_preg3_conj AND ct1.id_user_conj = ?
+        WHERE ct1.id_preg3_conj IS NULL
+        ORDER BY RAND()
+        LIMIT 10`,
+          [idCliente]
+        );
+
+        /*
+        if (preguntasGenerales.length < 20 || preguntasMax.length < 10) {
+          throw new Error("No hay suficientes preguntas en la base de datos.");
+        }
+        */
+
+        if (preguntasGenerales.length == 20 && preguntasMax.length == 10) {
+          const query3 =
+            "INSERT INTO conjunto_triv (id_user_conj, id_preg1_conj, id_preg2_conj, id_preg3_conj, num_trivia, estatus_conj) VALUES (?, ?, ?, ?, ?, ?)";
+
+          // Insertar 10 trivias asegurando que cada una tiene preguntas únicas
+          let idTrivia = trivia_nueva;
+          for (let i = 0; i < 10; i++) {
+            const pregunta_1 = preguntasGenerales.shift().id_pregunta;
+            const pregunta_2 = preguntasGenerales.shift().id_pregunta;
+            const pregunta_3 = preguntasMax.shift().id_pregunta_max;
+            await db.pool.query(query3, [
+              idCliente,
+              pregunta_1,
+              pregunta_2,
+              pregunta_3,
+              idTrivia,
+              "creada",
+            ]);
+            idTrivia++;
+          }
+        }
+
+      }
 
       if (trivia_nueva <= 50) {
 
