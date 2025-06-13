@@ -484,7 +484,7 @@ app.post("/desactivar", auth, checkRole('Cliente'), async (req, res) => {
   try {
 
     //const { userId } = req.body;
-    const { id_usuario: userId } = req.user;
+    const { id: userId } = req.user;
 
     let errors = Array();
 
