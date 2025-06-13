@@ -19,6 +19,16 @@ module.exports = (req, res, next) => {
 
     next();
   } catch (error) {
-    res.status(401).json({ error: true, msg: "Token no válido" });
+    if (error.name === "TokenExpiredError") {
+      return res.status(401).json({
+        error: true,
+        msg: "Token expirado",
+      });
+    }
+
+    return res.status(401).json({
+      error: true,
+      msg: "Token no válido",
+    });
   }
 };
