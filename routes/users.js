@@ -528,7 +528,7 @@ app.post("/desactivar", auth, checkRole('Cliente'), async (req, res) => {
   }
 });
 
-app.post("/resetpass", auth, checkRole('Cliente'), async (req, res) => {
+app.post("/resetpass", async (req, res) => {
   try {
     const { email } = req.body;
 
