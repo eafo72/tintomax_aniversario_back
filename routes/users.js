@@ -1209,15 +1209,17 @@ app.post("/registrarTicket", auth, checkRole('Colaborador'), upload.single("foto
     idUnidad,
     cantidadPrendas,
     total,
-    idCliente,
     idVendedor,
   } = req.body;
-
+  
+  const { id:idCliente } = req.user;
+  
   // Validaciones básicas
   if (
     !numeroNota || numeroNota == 0 ||
     !idUnidad || idUnidad == 0 ||
     !cantidadPrendas || cantidadPrendas == 0 ||
+    !idCliente || idCliente == 0 ||
     !total || total == 0 ||
     !req.file
   ) {
