@@ -1278,6 +1278,7 @@ app.post("/registrarTicket", auth, checkRole('Colaborador'), upload.single("foto
     [rows] = await db.pool.query(selectQuery, [idCliente]);
     const totalTickets = rows[0].total_tickets;
     if (totalTickets >= 3) {
+      console.log(totalTickets);
       return res
         .status(404)
         .json({ error: true, msg: "Ya registraste tus 3 tickets de hoy.Cada usuario puede registrar máximo 3 tickets por día" });
