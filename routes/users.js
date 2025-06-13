@@ -906,10 +906,9 @@ app.put("/set", async (req, res) => {
 
 app.put("/setName", auth, checkRole('Cliente'), async (req, res) => {
   try {
-    let {
-      id,
-      nombre_usur
-    } = req.body;
+    const {nombre_usur} = req.body;
+    const { id } = req.user;
+
 
     let errors = Array();
 
@@ -960,10 +959,8 @@ app.put("/setName", auth, checkRole('Cliente'), async (req, res) => {
 
 app.put("/setPhone", auth, checkRole('Cliente'), async (req, res) => {
   try {
-    let {
-      id,
-      tel_usur
-    } = req.body;
+    const {tel_usur} = req.body;
+    const { id } = req.user;
 
     let errors = Array();
 
@@ -1028,11 +1025,8 @@ app.put("/setPhone", auth, checkRole('Cliente'), async (req, res) => {
 
 app.put("/setPass", auth, checkRole('Cliente'), async (req, res) => {
   try {
-    let {
-      id,
-      oldpass,
-      pass
-    } = req.body;
+    const {oldpass,pass} = req.body;
+    const { id } = req.user;
 
     let errors = Array();
 
@@ -1107,10 +1101,8 @@ app.put("/setPass", auth, checkRole('Cliente'), async (req, res) => {
 
 app.put("/setCity", auth, checkRole('Cliente'), async (req, res) => {
   try {
-    let {
-      id,
-      ciudad_usur
-    } = req.body;
+    const {ciudad_usur} = req.body;
+    const { id } = req.user;
 
     let errors = Array();
 
