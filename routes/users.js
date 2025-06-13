@@ -483,7 +483,8 @@ app.post("/loginAdmin", async (req, res) => {
 app.post("/desactivar", auth, checkRole('Cliente'), async (req, res) => {
   try {
 
-    const { userId } = req.body;
+    //const { userId } = req.body;
+    const { id_usuario: userId } = req.user;
 
     let errors = Array();
 
