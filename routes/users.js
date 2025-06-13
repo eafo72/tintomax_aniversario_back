@@ -726,7 +726,8 @@ app.post("/verifyAccount", auth, async (req, res) => {
 
 app.post("/reenviarCorreoConfirmacion", auth, checkRole('Cliente'), async (req, res) => {
 
-  const { userId } = req.body;
+  //const { userId } = req.body;
+  const { id: userId } = req.user;
 
   if (!userId) {
     return res
