@@ -1274,7 +1274,7 @@ app.post("/registrarTicket", auth, checkRole('Colaborador'), upload.single("foto
     }
 
     //vemos si ya tiene 3 tickets registrados hoy
-    selectQuery = `SELECT COUNT(*) AS total_tickets FROM compras WHERE DATE(fecha_reg_comp) = CURDATE() AND id_usuario_comp = ?`;
+    selectQuery = `SELECT COUNT(*) AS total_tickets FROM compras WHERE fecha_comp >= CURDATE() AND fecha_comp < CURDATE() + INTERVAL 1 DAY AND id_usuario_comp = ?`;
     [rows] = await db.pool.query(selectQuery, [idCliente]);
     const totalTickets = rows[0].total_tickets;
     if (totalTickets >= 3) {
