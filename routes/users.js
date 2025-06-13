@@ -212,7 +212,7 @@ app.post("/crear", async (req, res) => {
     if (preguntasGenerales.length < 100 || preguntasMax.length < 50) {
       throw new Error("No hay suficientes preguntas en la base de datos.");
     }
-    */ 
+    */
 
     const [preguntasGenerales] = await db.pool.query(
       `SELECT p.id_pregunta
@@ -242,7 +242,7 @@ app.post("/crear", async (req, res) => {
     if (preguntasGenerales.length < 20 || preguntasMax.length < 10) {
       throw new Error("No hay suficientes preguntas en la base de datos.");
     }
- 
+
     const query3 =
       "INSERT INTO conjunto_triv (id_user_conj, id_preg1_conj, id_preg2_conj, id_preg3_conj, num_trivia, estatus_conj) VALUES (?, ?, ?, ?, ?, ?)";
 
@@ -388,7 +388,7 @@ app.post("/login", async (req, res) => {
       jwt.sign(
         payload,
         process.env.SECRET,
-        { expiresIn: expiracion},
+        { expiresIn: expiracion },
         (error, token) => {
           if (error) throw error;
 
@@ -480,7 +480,7 @@ app.post("/loginAdmin", async (req, res) => {
   }
 });
 
-app.post("/desactivar",auth, checkRole('Cliente'), async (req, res) => {
+app.post("/desactivar", auth, checkRole('Cliente'), async (req, res) => {
   try {
 
     const { userId } = req.body;
@@ -527,7 +527,7 @@ app.post("/desactivar",auth, checkRole('Cliente'), async (req, res) => {
   }
 });
 
-app.post("/resetpass",auth, checkRole('Cliente'), async (req, res) => {
+app.post("/resetpass", auth, checkRole('Cliente'), async (req, res) => {
   try {
     const { email } = req.body;
 
@@ -620,8 +620,8 @@ app.get("/obtener/:id", async (req, res) => {
     }
 
     let query = `SELECT id_usuario, nombre_usur, correo_usur, tel_usur, ciudad_usur, forma_usur, acumulado_usur, aviso_usur, term_usur, tipo_usur, estatus_usur  
-						FROM usuarios 
-						WHERE id_usuario = ?`;
+            FROM usuarios 
+            WHERE id_usuario = ?`;
     let user = await db.pool.query(query, [userId]);
 
     //console.log(user[0]);
@@ -723,7 +723,7 @@ app.post("/verifyAccount", auth, async (req, res) => {
 });
 
 
-app.post("/reenviarCorreoConfirmacion",auth, checkRole('Cliente'), async (req, res) => {
+app.post("/reenviarCorreoConfirmacion", auth, checkRole('Cliente'), async (req, res) => {
 
   const { userId } = req.body;
 
@@ -902,7 +902,7 @@ app.put("/set", async (req, res) => {
 });
 */
 
-app.put("/setName",auth, checkRole('Cliente'), async (req, res) => {
+app.put("/setName", auth, checkRole('Cliente'), async (req, res) => {
   try {
     let {
       id,
@@ -956,7 +956,7 @@ app.put("/setName",auth, checkRole('Cliente'), async (req, res) => {
   }
 });
 
-app.put("/setPhone",auth, checkRole('Cliente'), async (req, res) => {
+app.put("/setPhone", auth, checkRole('Cliente'), async (req, res) => {
   try {
     let {
       id,
@@ -1024,7 +1024,7 @@ app.put("/setPhone",auth, checkRole('Cliente'), async (req, res) => {
   }
 });
 
-app.put("/setPass",auth, checkRole('Cliente'), async (req, res) => {
+app.put("/setPass", auth, checkRole('Cliente'), async (req, res) => {
   try {
     let {
       id,
@@ -1103,7 +1103,7 @@ app.put("/setPass",auth, checkRole('Cliente'), async (req, res) => {
   }
 });
 
-app.put("/setCity",auth, checkRole('Cliente'), async (req, res) => {
+app.put("/setCity", auth, checkRole('Cliente'), async (req, res) => {
   try {
     let {
       id,
@@ -1200,7 +1200,7 @@ app.put("/delete", async (req, res) => {
 });
 */
 
-app.post("/registrarTicket",auth, checkRole('Colaborador'), upload.single("fotoTicket"), async (req, res) => {
+app.post("/registrarTicket", auth, checkRole('Colaborador'), upload.single("fotoTicket"), async (req, res) => {
 
   let firebase_token = null;
   let ultima_trivia = 0;
@@ -1221,7 +1221,7 @@ app.post("/registrarTicket",auth, checkRole('Colaborador'), upload.single("fotoT
 
   // Validaciones básicas
   if (
-    !numeroNota || numeroNota == 0 || 
+    !numeroNota || numeroNota == 0 ||
     !idUnidad || idUnidad == 0 ||
     !cantidadPrendas || cantidadPrendas == 0 ||
     !total || total == 0 ||
@@ -1273,6 +1273,15 @@ app.post("/registrarTicket",auth, checkRole('Colaborador'), upload.single("fotoT
         .json({ error: true, msg: "Verifica el número de nota, ésta ya fue registrada" });
     }
 
+    //vemos si ya tiene 3 tickets registrados hoy
+    selectQuery = `SELECT COUNT(*) AS total_tickets FROM compras WHERE DATE(fecha_reg_comp) = CURDATE() AND id_usuario_comp = ?`;
+    [rows] = await db.pool.query(selectQuery, [idCliente]);
+    const totalTickets = rows[0].total_tickets;
+    if (totalTickets >= 3) {
+      return res
+        .status(404)
+        .json({ error: true, msg: "Ya registraste tus 3 tickets de hoy.Cada usuario puede registrar máximo 3 tickets por día" });
+    }
 
     //vemos si existe el id de sucursal corresponde al cliente si existe traemos el token de firebase
     selectQuery = `SELECT id_usuario, firebase_token, correo_usur, nombre_usur FROM usuarios WHERE id_usuario = ? AND id_sucursal = ?`;
@@ -1352,7 +1361,7 @@ app.post("/registrarTicket",auth, checkRole('Colaborador'), upload.single("fotoT
     //solo agrega trivia si puntos > 0
     if (puntos > 0) {
       //buscamos la ultima trivia del usuario para saber cual vamos a asignar
-      const [rows] = await db.pool.query(
+      [rows] = await db.pool.query(
         `SELECT num_trivia FROM conjunto_triv WHERE id_user_conj = ? AND (estatus_conj = 'asignada' OR estatus_conj = 'contestada') ORDER BY num_trivia DESC LIMIT 1`,
         [idCliente]
       );
@@ -1439,15 +1448,10 @@ app.post("/registrarTicket",auth, checkRole('Colaborador'), upload.single("fotoT
           idCliente
         ];
 
-        let result2 = await db.pool.query(query2, values2);
+        await db.pool.query(query2, values2);
       }
 
     }
-    /*
-    res
-      .status(200)
-      .json({ error: false, msg: "Ticket registrado con éxito" });
-      */
 
   } catch (error) {
     res.status(400).json({ error: true, details: error });
@@ -1480,9 +1484,7 @@ app.post("/registrarTicket",auth, checkRole('Colaborador'), upload.single("fotoT
     console.log(info);
   } catch (error) {
     console.error("Error enviando correo:", error);
-    res
-      .status(500)
-      .json({ error: true, msg: "Error enviando correo" });
+
   }
 
 
@@ -1525,52 +1527,19 @@ app.post("/registrarTicket",auth, checkRole('Colaborador'), upload.single("fotoT
     admin.messaging().send(message)
       .then((messageId) => {
         console.log('Notificación enviada, messageId =', messageId);
-
-        if (trivia_nueva <= 50) {
-          res.status(201).json({
-            error: false,
-            msg: "Hemos registrado tu ticket, tienes una nueva trivia liberada",
-            nextTrivia: trivia_nueva,
-            ticketId: idCompra,
-          });
-        } else {
-          res.status(201).json({
-            error: false,
-            msg: "Hemos registrado tu ticket, has alcanzado el número máximo de trivias.",
-            nextTrivia: trivia_nueva,
-            ticketId: idCompra,
-          });
-        }
-
       })
       .catch((err) => {
         console.error('Error al enviar la notificación:', err);
-        res.status(500).send('Error al enviar la notificación');
       });
 
-
-
-  } else {
-    if (trivia_nueva <= 50) {
-      res.status(201).json({
-        error: false,
-        msg: "Hemos registrado tu ticket, tienes una nueva trivia liberada, pero no se enviaron notificaciones",
-        nextTrivia: trivia_nueva,
-        ticketId: idCompra,
-      });
-    } else {
-      res.status(201).json({
-        error: false,
-        msg: "Hemos registrado tu ticket, has alcanzado el número máximo de trivias, pero no se enviaron notificaciones",
-        nextTrivia: trivia_nueva,
-        ticketId: idCompra,
-      });
-
-    }
   }
+
+  res
+    .status(200)
+    .json({ error: false, msg: "Ticket registrado con éxito" });
 });
 
-app.get("/trivias/:id",auth, checkRole('Cliente'), async (req, res) => {
+app.get("/trivias/:id", auth, checkRole('Cliente'), async (req, res) => {
   let userId = req.params.id;
 
   if (!userId) {
@@ -1898,7 +1867,7 @@ async function cronRanking() {
     let fecha = `${year}-${month}-${day} ${hour}:${minute}:${second}`;
 
     //Actualizar el ranking
-   const updateRankingQuery = `    
+    const updateRankingQuery = `    
     UPDATE usuarios 
     JOIN (SELECT id_usuario, estatus_usur,
         RANK() OVER (ORDER BY acumulado_usur DESC) AS nueva_posicion
