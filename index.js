@@ -1,7 +1,7 @@
 const cron = require('node-cron');
 const express = require('express');
 const path = require('path');
-const helmet = require ('helmet');
+const helmet = require('helmet');
 //const verificarIPBloqueada = require('./middlewares/verificarIPBloqueada');
 const customRateLimit = require('./middlewares/customRateLimit');
 
@@ -70,7 +70,7 @@ app.use((req, res, next) => {
 
   if (allowedOrigins.includes(origin)) {
     res.header('Access-Control-Allow-Origin', origin);
-  }else{
+  } else {
     console.warn('[⚠️ ORIGIN NO PERMITIDO]', {
       metodo: req.method,
       url: req.originalUrl,
@@ -174,6 +174,7 @@ async function cronRanking() {
     `;
     */
 
+    /*
     const updateRankingQuery = `    
     UPDATE usuarios 
     JOIN (SELECT id_usuario, estatus_usur,
@@ -184,6 +185,25 @@ async function cronRanking() {
         WHEN ranking.estatus_usur = 'cancelado' THEN NULL 
         ELSE ranking.nueva_posicion 
     END;
+    `;
+    */
+
+    const updateRankingQuery = `    
+    UPDATE usuarios
+    JOIN (
+    SELECT 
+        id_usuario,
+        estatus_usur,
+        DENSE_RANK() OVER (
+            ORDER BY acumulado_usur DESC, created_at ASC
+        ) AS nueva_posicion
+    FROM usuarios
+    ) AS ranking
+    ON usuarios.id_usuario = ranking.id_usuario
+    SET usuarios.ranking_usur = CASE 
+    WHEN ranking.estatus_usur = 'cancelado' THEN NULL
+    ELSE ranking.nueva_posicion
+    END
     `;
 
     await db.pool.query(updateRankingQuery);

@@ -1278,7 +1278,7 @@ app.post("/registrarTicket", auth, checkRole('Colaborador'), upload.single("foto
     [rows] = await db.pool.query(selectQuery, [idCliente]);
     const totalTickets = rows[0].total_tickets;
     if (totalTickets >= 3) {
-      console.log(totalTickets);
+      //console.log(totalTickets);
       return res
         .status(404)
         .json({ error: true, msg: "Ya registraste tus 3 tickets de hoy.Cada usuario puede registrar máximo 3 tickets por día" });
@@ -1869,15 +1869,21 @@ async function cronRanking() {
 
     //Actualizar el ranking
     const updateRankingQuery = `    
-    UPDATE usuarios 
-    JOIN (SELECT id_usuario, estatus_usur,
-        RANK() OVER (ORDER BY acumulado_usur DESC) AS nueva_posicion
-        FROM usuarios) AS ranking 
-        ON usuarios.id_usuario = ranking.id_usuario
+    UPDATE usuarios
+    JOIN (
+    SELECT 
+        id_usuario,
+        estatus_usur,
+        DENSE_RANK() OVER (
+            ORDER BY acumulado_usur DESC, created_at ASC
+        ) AS nueva_posicion
+    FROM usuarios
+    ) AS ranking
+    ON usuarios.id_usuario = ranking.id_usuario
     SET usuarios.ranking_usur = CASE 
-        WHEN ranking.estatus_usur = 'cancelado' THEN NULL 
-        ELSE ranking.nueva_posicion 
-    END;
+    WHEN ranking.estatus_usur = 'cancelado' THEN NULL
+    ELSE ranking.nueva_posicion
+    END
     `;
     await db.pool.query(updateRankingQuery);
 
