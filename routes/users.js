@@ -1784,7 +1784,8 @@ app.get("/rankPositionStore/:id/:idSucursal", async (req, res) => {
 app.post('/save-token', auth, checkRole('Cliente'), async (req, res) => {
   try {
     const token = req.body.token;  // Recibe el token del cliente
-    const userId = req.body.userId; // ID del usuario (si lo necesitas)
+    //const userId = req.body.userId; // ID del usuario (si lo necesitas)
+    const { id:userId } = req.user;
 
     let errors = Array();
 
