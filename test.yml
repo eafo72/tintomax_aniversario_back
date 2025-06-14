@@ -1,5 +1,5 @@
 config:
-  target: 'https://api.maxaniversario.com' 
+  target: 'https://api.maxaniversario.com'
   phases:
     - duration: 60  # Duración de la prueba en segundos
       arrivalRate: 150  # Número de usuarios virtuales por segundo
@@ -7,8 +7,8 @@ config:
 
 scenarios:
   - flow:
-      - post:
-          url: "/usuario/login"  
-          json:
-            username: "alex@agencianuba.com"
-            password: "12345"
+      - get:
+          url: "/ranking/obtener"
+          headers:
+            Origin: "https://maxaniversario.com"
+            User-Agent: "Alex"

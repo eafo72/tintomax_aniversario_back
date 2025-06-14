@@ -9,9 +9,11 @@ const pool = mysql.createPool({
     password: process.env.DBPASSW,
     port:   3306,
     database: process.env.DBNAME,
-    connectionLimit: 20
+    waitForConnections: true,
+    connectionLimit: 20,
+    queueLimit: 100,           // peticiones esperando
+    acquireTimeout: 10000      // ms
 });
-
 
 pool.on('connection', connection =>{
     connection.query('SET time_zone="-06:00";',err =>{
