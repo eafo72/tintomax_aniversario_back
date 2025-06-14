@@ -10,5 +10,5 @@ scenarios:
       - post:
           url: "/usuario/login"  
           json:
-            username: "usuarioFalso"
-            password: "contrasenaFalsa"
+            username: "alex@agencianuba.com"
+            password: "12345"
