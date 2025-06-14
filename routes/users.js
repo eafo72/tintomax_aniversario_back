@@ -1368,8 +1368,8 @@ app.post("/registrarTicket", auth, checkRole('Colaborador'), upload.single("foto
 
       trivia_nueva = Number(ultima_trivia) + 1;
 
-      //si es 21, 31, 41 crear 10 nuevas trivias 
-      if (trivia_nueva == 11 || trivia_nueva == 21 || trivia_nueva == 31 || trivia_nueva == 41) {
+      //si es 21, 31, 41.... crear 10 nuevas trivias 
+      if (trivia_nueva == 11 || trivia_nueva == 21 || trivia_nueva == 31 || trivia_nueva == 41 || trivia_nueva == 51 || trivia_nueva == 61 || trivia_nueva == 71 || trivia_nueva == 81  || trivia_nueva == 91 || trivia_nueva == 101 || trivia_nueva == 111 || trivia_nueva == 121 || trivia_nueva == 131 ) {
 
         const [preguntasGenerales] = await db.pool.query(
           `SELECT p.id_pregunta
@@ -1425,7 +1425,7 @@ app.post("/registrarTicket", auth, checkRole('Colaborador'), upload.single("foto
 
       }
 
-      if (trivia_nueva <= 50) {
+      if (trivia_nueva <= 140) {
 
         //UPDATE
         const query2 = `UPDATE conjunto_triv SET 
@@ -1461,7 +1461,7 @@ app.post("/registrarTicket", auth, checkRole('Colaborador'), upload.single("foto
 
     let texto = null;
 
-    if (trivia_nueva <= 50) {
+    if (trivia_nueva <= 140) {
       texto = "Tienes una nueva trivia liberada"
     } else {
       texto = "Has alcanzado el número máximo de trivias";
@@ -1488,7 +1488,7 @@ app.post("/registrarTicket", auth, checkRole('Colaborador'), upload.single("foto
   if (firebase_token) {
 
     let message = {};
-    if (trivia_nueva <= 50) {
+    if (trivia_nueva <= 140) {
 
       message = {
         token: firebase_token,
